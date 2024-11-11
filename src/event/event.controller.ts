@@ -69,7 +69,7 @@ export class EventController {
 
   @Post(':eventId/out')
   @HttpCode(204)
-  @ApiOperation({ summary: '유저를 event에서 내보냅니다' })
+  @ApiOperation({ summary: '유저를 event에서 내보냅니다.' })
   @ApiNoContentResponse()
   async outEvent(
     @Param('eventId', ParseIntPipe) eventId: number,
