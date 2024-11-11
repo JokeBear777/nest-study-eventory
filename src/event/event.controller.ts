@@ -58,7 +58,7 @@ export class EventController {
 
   @Post(':eventId/join')
   @HttpCode(204)
-  @ApiOperation({ summary: '유저를 event에 참여시킵니다' })
+  @ApiOperation({ summary: '유저를 event에 참여시킵니다.' }) 
   @ApiNoContentResponse()
   async joinEvent(
     @Param('eventId', ParseIntPipe) eventId: number,
