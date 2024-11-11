@@ -79,8 +79,8 @@ export class EventController {
   }
 
   @Put(':eventId')
-  @ApiOperation({summary: '모임을 수정합니다'})
-  @ApiOkResponse({type: EventDto})
+  @ApiOperation({ summary: '모임을 수정합니다' })
+  @ApiOkResponse({ type: EventDto })
   async putUpdateEvent(
     @Param('eventId', ParseIntPipe) eventId: number,
     @Body() payload: PutUpdateEventPayload,
@@ -90,13 +90,11 @@ export class EventController {
 
   @Delete(':eventId')
   @HttpCode(204)
-  @ApiOperation({summary : '이벤트를 삭제합니다'})
+  @ApiOperation({ summary: '이벤트를 삭제합니다' })
   @ApiNoContentResponse()
   async deleteEvent(
     @Param('eventId', ParseIntPipe) eventId: number,
-  ):Promise<void> {
+  ): Promise<void> {
     return this.eventService.deleteEvent(eventId);
   }
-
-
 }
