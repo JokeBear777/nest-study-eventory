@@ -33,10 +33,10 @@ export class CreateEventPayload {
 
   @IsInt()
   @ApiProperty({
-    description: '지역',
-    type: Number,
+    description: '지역 목록',
+    type: [Number],
   })
-  cityId!: number;
+  cityIds!: number[];
 
   @Type(() => Date)
   @IsDate()

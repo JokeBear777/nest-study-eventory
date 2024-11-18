@@ -33,10 +33,10 @@ export class EventDto {
   categoryId!: number;
 
   @ApiProperty({
-    description: '지역',
-    type: Number,
+    description: '지역 목록',
+    type: [Number],
   })
-  cityId!: number;
+  cityIds!: number[];
 
   @ApiProperty({
     description: '시작 시각',
@@ -63,7 +63,7 @@ export class EventDto {
       title: event.title,
       description: event.description,
       categoryId: event.categoryId,
-      cityId: event.cityId,
+      cityIds: event.eventCity.map((city) => city.cityId),
       startTime: event.startTime,
       endTime: event.endTime,
       maxPeople: event.maxPeople,

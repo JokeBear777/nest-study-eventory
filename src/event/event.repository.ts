@@ -18,7 +18,6 @@ export class EventRepository {
         title: data.title,
         description: data.description,
         categoryId: data.categoryId,
-        cityId: data.cityId,
         startTime: data.startTime,
         endTime: data.endTime,
         maxPeople: data.maxPeople,
@@ -27,6 +26,11 @@ export class EventRepository {
             userId: data.hostId,
           },
         },
+        eventCity: {
+          create: data.cityIds.map((cityId) => ({
+            cityId,
+          })),
+        },
       },
       select: {
         id: true,
@@ -34,10 +38,15 @@ export class EventRepository {
         title: true,
         description: true,
         categoryId: true,
-        cityId: true,
         startTime: true,
         endTime: true,
         maxPeople: true,
+        eventCity: {
+          select: {
+            id: true,
+            cityId: true,
+          },
+        },
       },
     });
   }
@@ -78,10 +87,15 @@ export class EventRepository {
         title: true,
         description: true,
         categoryId: true,
-        cityId: true,
         startTime: true,
         endTime: true,
         maxPeople: true,
+        eventCity: {
+          select: {
+            id: true,
+            cityId: true,
+          },
+        },
       },
     });
   }
@@ -90,7 +104,13 @@ export class EventRepository {
     return this.prisma.event.findMany({
       where: {
         hostId: query.hostId,
-        cityId: query.cityId,
+        ...(query.cityId && {
+          eventCity: {
+            some: {
+              cityId: query.cityId,
+            },
+          },
+        }),
         categoryId: query.categoryId,
       },
       select: {
@@ -99,10 +119,15 @@ export class EventRepository {
         title: true,
         description: true,
         categoryId: true,
-        cityId: true,
         startTime: true,
         endTime: true,
         maxPeople: true,
+        eventCity: {
+          select: {
+            id: true,
+            cityId: true,
+          },
+        },
       },
     });
   }
@@ -176,10 +201,14 @@ export class EventRepository {
         title: data.title,
         description: data.description,
         categoryId: data.categoryId,
-        cityId: data.cityId,
         startTime: data.startTime,
         endTime: data.endTime,
         maxPeople: data.maxPeople,
+        eventCity: {
+          create: data.cityIds.map((cityId) => ({
+            cityId, 
+          })),
+        },
       },
       select: {
         id: true,
@@ -187,10 +216,15 @@ export class EventRepository {
         title: true,
         description: true,
         categoryId: true,
-        cityId: true,
         startTime: true,
         endTime: true,
         maxPeople: true,
+        eventCity: {
+          select: {
+            id: true,
+            cityId: true,
+          },
+        },
       },
     });
   }
