@@ -206,7 +206,7 @@ export class EventRepository {
         maxPeople: data.maxPeople,
         eventCity: {
           create: data.cityIds.map((cityId) => ({
-            cityId, 
+            cityId,
           })),
         },
       },
