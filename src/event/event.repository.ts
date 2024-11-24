@@ -76,6 +76,14 @@ export class EventRepository {
     });
   }
 
+  async getCitiesById(cityIds: number[]): Promise<City[]> {
+    return this.prisma.city.findMany({
+      where: {
+        id: { in: cityIds },
+      },
+    });
+  }
+
   async getEventById(eventId: number): Promise<EventData | null> {
     return this.prisma.event.findUnique({
       where: {
