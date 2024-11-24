@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,17 +12,13 @@ import { EventQuery } from './query/event.query';
 import { UpdateEventJoinPayload } from './payload/update-event-join-payload';
 import type { PutUpdateEventPayload } from './payload/put-update-event-payload';
 import type { UpdateEventData } from './type/update-event-data';
+import type { UserBaseInfo } from 'src/auth/type/user-base-info.type';
 
 @Injectable()
 export class EventService {
   constructor(private readonly eventRepository: EventRepository) {}
 
-  async createEvent(payload: CreateEventPayload): Promise<EventDto> {
-    const host = await this.eventRepository.getUserById(payload.hostId);
-    if (!host) {
-      throw new NotFoundException('호스트가 존재하지 않습니다.');
-    }
-
+  async createEvent(payload: CreateEventPayload, user : UserBaseInfo): Promise<EventDto> {
     const category = await this.eventRepository.getCategoryById(
       payload.categoryId,
     );
@@ -47,7 +44,7 @@ export class EventService {
     }
 
     const createData: CreateEventData = {
-      hostId: payload.hostId,
+      hostId: user.id,
       title: payload.title,
       description: payload.description,
       categoryId: payload.categoryId,
@@ -79,12 +76,8 @@ export class EventService {
 
   async joinEvent(
     eventId: number,
-    payload: UpdateEventJoinPayload,
+    user: UserBaseInfo,
   ): Promise<void> {
-    const user = await this.eventRepository.getUserById(payload.userId);
-    if (!user) {
-      throw new NotFoundException('유저가 존재하지 않습니다.');
-    }
 
     const event = await this.eventRepository.getEventById(eventId);
     if (!event) {
@@ -93,7 +86,7 @@ export class EventService {
 
     const isEventJoin = await this.eventRepository.isUserJoinedEvent(
       eventId,
-      payload.userId,
+      user.id,
     );
     if (isEventJoin) {
       throw new ConflictException('이미 참가한 모임입니다.');
@@ -109,18 +102,13 @@ export class EventService {
       throw new ConflictException('모임 인원이 가득차 참가할 수 없습니다');
     }
 
-    await this.eventRepository.joinEvent(eventId, payload);
+    await this.eventRepository.joinEvent(eventId, user.id);
   }
 
   async outEvent(
     eventId: number,
-    payload: UpdateEventJoinPayload,
+    user: UserBaseInfo,
   ): Promise<void> {
-    const user = await this.eventRepository.getUserById(payload.userId);
-    if (user) {
-      throw new NotFoundException('유저가 존재하지 않습니다.');
-    }
-
     const event = await this.eventRepository.getEventById(eventId);
     if (!event) {
       throw new NotFoundException('이벤트가 존재하지 않습니다.');
@@ -128,7 +116,7 @@ export class EventService {
 
     const eventJoin = await this.eventRepository.isUserJoinedEvent(
       eventId,
-      payload.userId,
+      user.id,
     );
     if (!eventJoin) {
       throw new ConflictException('참가하지 않은 모임은 탈퇴할 수 없습니다');
@@ -148,17 +136,22 @@ export class EventService {
       throw new ConflictException('모임 인원은 최소 1명 이상이여야 합니다');
     }
 
-    await this.eventRepository.outEvent(eventId, payload.userId);
+    await this.eventRepository.outEvent(eventId, user.id);
   }
 
   async putUpdateEvent(
     eventId: number,
     payload: PutUpdateEventPayload,
+    user: UserBaseInfo,
   ): Promise<EventDto> {
     const event = await this.eventRepository.getEventById(eventId);
 
     if (!event) {
       throw new NotFoundException('Event가 존재하지 않습니다.');
+    }
+
+    if (event.hostId !== user.id) {
+      throw new ForbiddenException('모임 주최자만 수정할 수 있습니다');
     }
 
     const category = await this.eventRepository.getCategoryById(
@@ -214,11 +207,15 @@ export class EventService {
     return EventDto.from(updatedEvent);
   }
 
-  async deleteEvent(eventId: number): Promise<void> {
+  async deleteEvent(eventId: number, user: UserBaseInfo): Promise<void> {
     const event = await this.eventRepository.getEventById(eventId);
 
     if (!event) {
       throw new NotFoundException('event가 존재하지 않습니다.');
+    }
+
+    if (event.hostId !== user.id) {
+      throw new ForbiddenException('모임 주최자만 수정할 수 있습니다');
     }
 
     if (event.startTime < new Date()) {
@@ -227,4 +224,11 @@ export class EventService {
 
     await this.eventRepository.deleteEvent(eventId);
   }
+
+  async getMyEvents(user: UserBaseInfo): Promise<EventListDto> {
+    const events = await this.eventRepository.getEventsJoinedBy(user.id);
+
+    return EventListDto.from(events);
+  }
+  
 }

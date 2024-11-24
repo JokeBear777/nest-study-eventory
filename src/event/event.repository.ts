@@ -6,6 +6,7 @@ import { Category, City, User } from '@prisma/client';
 import { EventQuery } from './query/event.query';
 import { UpdateEventJoinPayload } from './payload/update-event-join-payload';
 import type { UpdateEventData } from './type/update-event-data';
+import type { UserBaseInfo } from 'src/auth/type/user-base-info.type';
 
 @Injectable()
 export class EventRepository {
@@ -142,12 +143,12 @@ export class EventRepository {
 
   async joinEvent(
     eventId: number,
-    payload: UpdateEventJoinPayload,
+    userId: number,
   ): Promise<void> {
     this.prisma.eventJoin.create({
       data: {
         eventId: eventId,
-        userId: payload.userId,
+        userId: userId
       },
       select: {
         id: true,
@@ -247,6 +248,34 @@ export class EventRepository {
     await this.prisma.event.delete({
       where: {
         id: eventId,
+      },
+    });
+  }
+
+  async getEventsJoinedBy(userId: number): Promise<EventData[]> {
+    return this.prisma.event.findMany({
+      where: {
+        eventJoin: {
+          some: {
+            userId,
+          },
+        },
+      },
+      select: {
+        id: true,
+        hostId: true,
+        title: true,
+        description: true,
+        categoryId: true,
+        eventCity: {
+          select: {
+            id: true,
+            cityId: true,
+          },
+        },
+        startTime: true,
+        endTime: true,
+        maxPeople: true,
       },
     });
   }
