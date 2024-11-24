@@ -43,8 +43,8 @@ export class EventController {
   @ApiCreatedResponse({ type: EventDto })
   async createdEvent(
     @Body() payload: CreateEventPayload,
-    @CurrentUser() user : UserBaseInfo, 
-    ): Promise<EventDto> {
+    @CurrentUser() user: UserBaseInfo,
+  ): Promise<EventDto> {
     return this.eventService.createEvent(payload, user);
   }
 
