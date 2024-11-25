@@ -18,7 +18,7 @@ import { AuthModule } from '../auth/auth.module';
     CommonModule,
     ReviewModule,
     UserModule,
-    CategoryModule,           
+    CategoryModule,
     EventModule,
   ],
   controllers: [AppController],

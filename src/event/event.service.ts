@@ -18,7 +18,10 @@ import type { UserBaseInfo } from 'src/auth/type/user-base-info.type';
 export class EventService {
   constructor(private readonly eventRepository: EventRepository) {}
 
-  async createEvent(payload: CreateEventPayload, user : UserBaseInfo): Promise<EventDto> {
+  async createEvent(
+    payload: CreateEventPayload,
+    user: UserBaseInfo,
+  ): Promise<EventDto> {
     const category = await this.eventRepository.getCategoryById(
       payload.categoryId,
     );
@@ -74,11 +77,7 @@ export class EventService {
     return EventListDto.from(events);
   }
 
-  async joinEvent(
-    eventId: number,
-    user: UserBaseInfo,
-  ): Promise<void> {
-
+  async joinEvent(eventId: number, user: UserBaseInfo): Promise<void> {
     const event = await this.eventRepository.getEventById(eventId);
     if (!event) {
       throw new NotFoundException('이벤트가 존재하지 않습니다.');
@@ -105,10 +104,7 @@ export class EventService {
     await this.eventRepository.joinEvent(eventId, user.id);
   }
 
-  async outEvent(
-    eventId: number,
-    user: UserBaseInfo,
-  ): Promise<void> {
+  async outEvent(eventId: number, user: UserBaseInfo): Promise<void> {
     const event = await this.eventRepository.getEventById(eventId);
     if (!event) {
       throw new NotFoundException('이벤트가 존재하지 않습니다.');
@@ -230,5 +226,4 @@ export class EventService {
 
     return EventListDto.from(events);
   }
-  
 }

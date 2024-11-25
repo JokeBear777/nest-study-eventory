@@ -141,14 +141,11 @@ export class EventRepository {
     });
   }
 
-  async joinEvent(
-    eventId: number,
-    userId: number,
-  ): Promise<void> {
+  async joinEvent(eventId: number, userId: number): Promise<void> {
     this.prisma.eventJoin.create({
       data: {
         eventId: eventId,
-        userId: userId
+        userId: userId,
       },
       select: {
         id: true,
@@ -215,7 +212,7 @@ export class EventRepository {
         maxPeople: data.maxPeople,
         eventCity: {
           create: data.cityIds.map((cityId) => ({
-            cityId, 
+            cityId,
           })),
         },
       },
