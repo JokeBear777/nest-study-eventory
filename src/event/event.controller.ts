@@ -25,10 +25,10 @@ import { EventDto, EventListDto } from './dto/event.dto';
 import { CreateEventPayload } from './payload/create-event-payload';
 import { EventQuery } from './query/event.query';
 import { UpdateEventJoinPayload } from './payload/update-event-join-payload';
-import type { PutUpdateEventPayload } from './payload/put-update-event-payload';
+import { PutUpdateEventPayload } from './payload/put-update-event-payload';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/decorator/user.decorator';
-import type { UserBaseInfo } from 'src/auth/type/user-base-info.type';
+import { UserBaseInfo } from 'src/auth/type/user-base-info.type';
 
 @Controller('events')
 @ApiTags('Event API')
