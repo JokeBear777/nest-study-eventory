@@ -1,3 +1,3 @@
 export type ApproveApplicantsData = {
-    userIds: number[];
-}
+  userIds: number[];
+};

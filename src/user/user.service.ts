@@ -1,4 +1,10 @@
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import type { UserBaseInfo } from 'src/auth/type/user-base-info.type';
 import type { UpdateUserPayload } from './payload/update-user.payload';
@@ -20,7 +26,6 @@ export class UserService {
   }
 
   async deleteUser(userId: number, user: UserBaseInfo): Promise<void> {
-
     if (userId !== user.id) {
       throw new ForbiddenException('타인의 계정은 삭제할 수 없습니다.');
     }
@@ -95,6 +100,4 @@ export class UserService {
       cityId: payload.cityId,
     };
   }
-
-
 }
