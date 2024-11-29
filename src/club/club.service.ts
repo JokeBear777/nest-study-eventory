@@ -1,18 +1,18 @@
 import { ConflictException, ForbiddenException, Injectable, NotFoundException, Put } from "@nestjs/common";
-import type { ClubRepository } from "./club.repository";
-import type { CreateClubPayload } from "./payload/create-club-payload";
-import type { UserBaseInfo } from "src/auth/type/user-base-info.type";
+import { ClubRepository } from "./club.repository";
+import { CreateClubPayload } from "./payload/create-club-payload";
+import { UserBaseInfo } from "src/auth/type/user-base-info.type";
 import { ClubDto } from "./dto/ClubDto";
-import type { CreateClubData } from "./type/create-club-data";
-import type { PutUpdateClubPayload } from "./payload/put-update-club-payload";
-import type { UpdateClubData } from "./type/update-club-data";
-import type { ClubMemberStatus } from "./type/club-member-status";
-import type { ApproveApplicantsData } from "./type/approve-applicants-data";
-import type { RejectApplicantsPayload } from "./payload/reject-applicants-payload";
-import type { ApproveApplicantsPayload } from "./payload/approve-applicants-payload";
-import type { RejectApplicantsData } from "./type/reject-applicants-data";
+import { CreateClubData } from "./type/create-club-data";
+import { PutUpdateClubPayload } from "./payload/put-update-club-payload";
+import { UpdateClubData } from "./type/update-club-data";
+import { ClubMemberStatus } from "./type/club-member-status";
+import { ApproveApplicantsData } from "./type/approve-applicants-data";
+import { RejectApplicantsPayload } from "./payload/reject-applicants-payload";
+import { ApproveApplicantsPayload } from "./payload/approve-applicants-payload";
+import { RejectApplicantsData } from "./type/reject-applicants-data";
 import { ClubMemberListDto } from "./dto/ClubMemberDto";
-import type { UpdateClubHostPayload } from "./payload/update-club-host-payload";
+import { UpdateClubHostPayload } from "./payload/update-club-host-payload";
 
 
 @Injectable()

@@ -2,15 +2,15 @@ import { Body, Controller, Delete, Get, HttpCode, Param, ParseIntPipe, Patch, Po
 import { ApiBearerAuth, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { CurrentUser } from "src/auth/decorator/user.decorator";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
-import type { ClubService } from "./club.service";
+import { ClubService } from "./club.service";
 import { ClubDto } from "./dto/ClubDto";
-import type { UserBaseInfo } from "src/auth/type/user-base-info.type";
-import type { CreateClubPayload } from "./payload/create-club-payload";
-import type { PutUpdateClubPayload } from "./payload/put-update-club-payload";
-import type { RejectApplicantsPayload } from "./payload/reject-applicants-payload";
-import type { ApproveApplicantsPayload } from "./payload/approve-applicants-payload";
+import { UserBaseInfo } from "src/auth/type/user-base-info.type";
+import { CreateClubPayload } from "./payload/create-club-payload";
+import { PutUpdateClubPayload } from "./payload/put-update-club-payload";
+import { RejectApplicantsPayload } from "./payload/reject-applicants-payload";
+import { ApproveApplicantsPayload } from "./payload/approve-applicants-payload";
 import { ClubMemberListDto } from "./dto/ClubMemberDto";
-import type { UpdateClubHostPayload } from "./payload/update-club-host-payload";
+import { UpdateClubHostPayload } from "./payload/update-club-host-payload";
 
 @Controller('clubs')
 @ApiTags('club API')

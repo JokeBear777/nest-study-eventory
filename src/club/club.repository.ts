@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
-import type { PrismaService } from "src/common/services/prisma.service";
-import type { CreateClubData } from "./type/create-club-data";
-import type { ClubData } from "./type/club-data";
-import type { ClubMemberStatus } from "./type/club-member-status";
-import type { UpdateClubData } from "./type/update-club-data";
-import type { ApproveApplicantsData } from "./type/approve-applicants-data";
-import type { RejectApplicantsData } from "./type/reject-applicants-data";
-import type { ClubMemberData } from "./type/club-member-data";
+import { PrismaService } from "src/common/services/prisma.service";
+import { CreateClubData } from "./type/create-club-data";
+import { ClubData } from "./type/club-data";
+import { ClubMemberStatus } from "./type/club-member-status";
+import { UpdateClubData } from "./type/update-club-data";
+import { ApproveApplicantsData } from "./type/approve-applicants-data";
+import { RejectApplicantsData } from "./type/reject-applicants-data";
+import { ClubMemberData } from "./type/club-member-data";
 
 
 @Injectable()
@@ -85,7 +85,7 @@ export class ClubRepository{
         });
     }
 
-    async getClubById(clubId: number): Promise<ClubData> {
+    async getClubById(clubId: number): Promise<ClubData|null> {
         return this.prisma.club.findUnique({
             where:{
                 id:clubId,
@@ -219,9 +219,11 @@ export class ClubRepository{
     async outClub(clubId: number, userId: number) :Promise<void> {
         await this.prisma.clubMember.delete({
             where: {
-                clubId: clubId,
-                userId: userId,
-            },
+                clubId_userId: {
+                  clubId: clubId,
+                  userId: userId,
+                },
+              },
         });
     }
 
