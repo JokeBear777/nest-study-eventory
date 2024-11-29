@@ -156,7 +156,7 @@ model club {
 
   host  User  @relation(fields: [hostId], references: [id])
 
-  clubJoin    ClubJoin[]
+  clubMember    ClubMember[]
   event       Event[]
 
   @@map("club")
@@ -173,5 +173,6 @@ model clubMember {
   club  Club  @relation(fields: [clubId], references: [id])
   user  User  @relation(fields: [userId], references: [id])
 
+  @@unique([clubId, userId])
   @@map("club_member")
 }
