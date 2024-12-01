@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsSemVer, IsString, Min } from 'class-validator';
 
 export class CreateClubPayload {
-  @IsString()
+  @IsInt()
   @ApiProperty({
     description: '클럽장 Id',
     type: Number,
