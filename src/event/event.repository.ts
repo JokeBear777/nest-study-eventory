@@ -5,8 +5,8 @@ import { EventData } from './type/event-data';
 import { Category, City, User } from '@prisma/client';
 import { EventQuery } from './query/event.query';
 import { UpdateEventJoinPayload } from './payload/update-event-join-payload';
-import type { UpdateEventData } from './type/update-event-data';
-import type { UserBaseInfo } from 'src/auth/type/user-base-info.type';
+import { UpdateEventData } from './type/update-event-data';
+import { UserBaseInfo } from 'src/auth/type/user-base-info.type';
 
 @Injectable()
 export class EventRepository {

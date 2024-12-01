@@ -10,9 +10,9 @@ import { EventDto, EventListDto } from './dto/event.dto';
 import { CreateEventData } from './type/create-event-data.type';
 import { EventQuery } from './query/event.query';
 import { UpdateEventJoinPayload } from './payload/update-event-join-payload';
-import type { PutUpdateEventPayload } from './payload/put-update-event-payload';
-import type { UpdateEventData } from './type/update-event-data';
-import type { UserBaseInfo } from 'src/auth/type/user-base-info.type';
+import { PutUpdateEventPayload } from './payload/put-update-event-payload';
+import { UpdateEventData } from './type/update-event-data';
+import { UserBaseInfo } from 'src/auth/type/user-base-info.type';
 
 @Injectable()
 export class EventService {
