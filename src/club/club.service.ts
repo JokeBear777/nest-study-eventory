@@ -1,11 +1,16 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
-import { CreateClubPayload } from "./payload/create-club-payload";
-import { UserBaseInfo } from "src/auth/type/user-base-info.type";
-import { PutUpdateClubPayload } from "./payload/put-update-club-payload";
-import { CreateClubData } from "./type/create-club-data";
-import { UpdateClubData } from "./type/update-club-data";
-import { ClubRepository } from "./club.repository";
-import { ClubDto } from "./dto/club.dto";
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreateClubPayload } from './payload/create-club-payload';
+import { UserBaseInfo } from 'src/auth/type/user-base-info.type';
+import { PutUpdateClubPayload } from './payload/put-update-club-payload';
+import { CreateClubData } from './type/create-club-data';
+import { UpdateClubData } from './type/update-club-data';
+import { ClubRepository } from './club.repository';
+import { ClubDto } from './dto/club.dto';
 
 @Injectable()
 export class ClubService {
@@ -74,6 +79,4 @@ export class ClubService {
 
     await this.clubRepository.deleteClub(clubId);
   }
-
-  
 }

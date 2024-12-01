@@ -23,7 +23,7 @@ export class ClubMemberDto {
 
   @ApiProperty({
     description: '멤버 상태',
-    enum: Status
+    enum: Status,
   })
   status!: Status;
 

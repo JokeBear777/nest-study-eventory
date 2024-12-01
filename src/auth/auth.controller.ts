@@ -1,4 +1,13 @@
-import { Body, Controller, HttpCode, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  Put,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -99,5 +108,4 @@ export class AuthController {
   ): Promise<void> {
     return this.authService.changePassword(payload, user);
   }
-
 }

@@ -1,12 +1,29 @@
-import { Body, Controller, Delete, HttpCode, Param, ParseIntPipe, Post, Put, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
-import { CurrentUser } from "src/auth/decorator/user.decorator";
-import { UserBaseInfo } from "src/auth/type/user-base-info.type";
-import { CreateClubPayload } from "./payload/create-club-payload";
-import { PutUpdateClubPayload } from "./payload/put-update-club-payload";
-import { ClubService } from "./club.service";
-import { ClubDto } from "./dto/club.dto";
+import {
+  Body,
+  Controller,
+  Delete,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { CurrentUser } from 'src/auth/decorator/user.decorator';
+import { UserBaseInfo } from 'src/auth/type/user-base-info.type';
+import { CreateClubPayload } from './payload/create-club-payload';
+import { PutUpdateClubPayload } from './payload/put-update-club-payload';
+import { ClubService } from './club.service';
+import { ClubDto } from './dto/club.dto';
 
 @Controller('clubs')
 @ApiTags('club API')
@@ -51,5 +68,4 @@ export class ClubController {
   ): Promise<void> {
     return this.clubService.deleteClub(clubId, user);
   }
-
 }

@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { CreateClubData } from "./type/create-club-data";
-import { ClubData } from "./type/club-data";
-import { PrismaService } from "src/common/services/prisma.service";
-import { UpdateClubData } from "./type/update-club-data";
-import { Status } from "@prisma/client";
+import { Injectable } from '@nestjs/common';
+import { CreateClubData } from './type/create-club-data';
+import { ClubData } from './type/club-data';
+import { PrismaService } from 'src/common/services/prisma.service';
+import { UpdateClubData } from './type/update-club-data';
+import { Status } from '@prisma/client';
 
 @Injectable()
 export class ClubRepository {
@@ -101,6 +101,4 @@ export class ClubRepository {
       },
     });
   }
-
-
 }
