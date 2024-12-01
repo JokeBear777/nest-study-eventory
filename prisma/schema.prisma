@@ -181,4 +181,6 @@ enum Status {
   PENDING
   APPROVED
   LEADER
+
+  @@map("status")
 }
