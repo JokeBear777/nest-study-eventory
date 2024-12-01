@@ -19,7 +19,7 @@ import { clubModule } from 'src/club/club.module';
     CommonModule,
     ReviewModule,
     UserModule,
-    CategoryModule,           
+    CategoryModule,
     EventModule,
     clubModule,
     AuthModule,

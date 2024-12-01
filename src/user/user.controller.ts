@@ -1,6 +1,21 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, ParseIntPipe, Patch, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiBearerAuth, ApiNoContentResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { CurrentUser } from 'src/auth/decorator/user.decorator';
 import type { UserBaseInfo } from 'src/auth/type/user-base-info.type';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
