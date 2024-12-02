@@ -3,6 +3,7 @@ import { CreateClubData } from './type/create-club-data';
 import { ClubData } from './type/club-data';
 import { PrismaService } from 'src/common/services/prisma.service';
 import { Status } from '@prisma/client';
+import { UpdateClubData } from './type/update-club-data';
 
 @Injectable()
 export class ClubRepository {
@@ -31,4 +32,62 @@ export class ClubRepository {
       },
     });
   }
+
+  async getClubById(clubId: number): Promise<ClubData | null> {
+    return this.prisma.club.findUnique({
+      where: {
+        id: clubId,
+      },
+    });
+  }
+
+  async getHostIdByClubId(clubId: number): Promise<number | null> {
+    const result = await this.prisma.club.findUnique({
+      where: {
+        id: clubId,
+      },
+      select: {
+        hostId: true,
+      },
+    });
+
+    return result?.hostId ?? null;
+  }
+
+  
+
+  async getClubHeadCount(clubId: number): Promise<number> {
+    return this.prisma.clubMember.count({
+      where: {
+        clubId: clubId,
+        user: {
+          deletedAt: null,
+        },
+        status: {
+          not: Status.PENDING,
+        },
+      },
+    });
+  }
+
+  async updateClub(clubId: number, data: UpdateClubData): Promise<ClubData> {
+    return this.prisma.club.update({
+      where: {
+        id: clubId,
+      },
+      data: {
+        name: data.name,
+        description: data.description,
+        maxPeople: data.maxPeople,
+      },
+      select: {
+        id: true,
+        hostId: true,
+        name: true,
+        description: true,
+        maxPeople: true,
+      },
+    });
+  }
+
 }
