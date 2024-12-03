@@ -74,4 +74,33 @@ export class ClubRepository {
       },
     });
   }
+
+  async deleteClub(clubId: number): Promise<void> {
+    await this.prisma.clubMember.deleteMany({
+      where: {
+        clubId: clubId,
+      },
+    });
+
+    await this.prisma.club.delete({
+      where: {
+        id: clubId,
+      },
+    });
+  }
+
+  async unlinkEventsFromClub(clubId: number): Promise<void> {
+    await this.prisma.event.updateMany({
+      where : {
+        clubId : clubId,
+      },
+      data : {
+        clubId : null,
+      }
+    });
+  }
+
 }
+
+  
+
