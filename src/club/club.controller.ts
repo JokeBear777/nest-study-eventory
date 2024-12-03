@@ -23,6 +23,7 @@ import { UserBaseInfo } from 'src/auth/type/user-base-info.type';
 import { CreateClubPayload } from './payload/create-club-payload';
 import { ClubService } from './club.service';
 import { ClubDto } from './dto/club.dto';
+import { PutUpdateClubPayload } from './payload/put-update-club-payload';
 
 @Controller('clubs')
 @ApiTags('club API')
@@ -40,5 +41,18 @@ export class ClubController {
     @CurrentUser() user: UserBaseInfo,
   ): Promise<ClubDto> {
     return this.clubService.createClub(payload, user);
+  }
+
+  @Put(':clubId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '클럽을 수정합니다' })
+  @ApiOkResponse({ type: ClubDto })
+  async putUpdateClub(
+    @Param('clubId', ParseIntPipe) clubId: number,
+    @Body() payload: PutUpdateClubPayload,
+    @CurrentUser() user: UserBaseInfo,
+  ): Promise<ClubDto> {
+    return this.clubService.putUpdateClub(clubId, payload, user);
   }
 }
