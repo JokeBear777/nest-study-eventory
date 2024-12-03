@@ -65,5 +65,4 @@ export class ClubService {
 
     return ClubDto.from(updatedClub);
   }
-
 }
