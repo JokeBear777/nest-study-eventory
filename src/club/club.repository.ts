@@ -41,21 +41,6 @@ export class ClubRepository {
     });
   }
 
-  async getHostIdByClubId(clubId: number): Promise<number | null> {
-    const result = await this.prisma.club.findUnique({
-      where: {
-        id: clubId,
-      },
-      select: {
-        hostId: true,
-      },
-    });
-
-    return result?.hostId ?? null;
-  }
-
-  
-
   async getClubHeadCount(clubId: number): Promise<number> {
     return this.prisma.clubMember.count({
       where: {
