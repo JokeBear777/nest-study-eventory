@@ -42,13 +42,13 @@ export class ClubService {
       throw new NotFoundException('클럽이 존재하지 않습니다.');
     }
 
-    const hostId = await this.clubRepository.getHostIdByClubId(clubId);
+    const hostId = club.hostId;
     if (hostId != user.id) {
       throw new ForbiddenException('클럽장만 수정할 수 있습니다.');
     }
 
-    const eventHeadCount = await this.clubRepository.getClubHeadCount(clubId);
-    if (payload.maxPeople < eventHeadCount) {
+    const clubHeadCount = await this.clubRepository.getClubHeadCount(clubId);
+    if (payload.maxPeople < clubHeadCount) {
       throw new ConflictException('최대 인원은 현재 인원보다 적을 수 없습니다');
     }
 
