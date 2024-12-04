@@ -8,10 +8,9 @@ import { CreateClubPayload } from './payload/create-club-payload';
 import { UserBaseInfo } from 'src/auth/type/user-base-info.type';
 import { CreateClubData } from './type/create-club-data';
 import { ClubRepository } from './club.repository';
-import { ClubDto } from './dto/club.dto';
+import { ClubDto, ClubListDto } from './dto/club.dto';
 import { PutUpdateClubPayload } from './payload/put-update-club-payload';
 import { UpdateClubData } from './type/update-club-data';
-import type { EventRepository } from 'src/event/event.repository';
 
 @Injectable()
 export class ClubService {
@@ -81,5 +80,10 @@ export class ClubService {
     const date = new Date();
 
     await this.clubRepository.deleteClub(clubId, date);
+  }
+
+  async getClubList(): Promise<ClubListDto> {
+    const clubs = await this.clubRepository.getClubList();
+    return ClubListDto.from(clubs);
   }
 }

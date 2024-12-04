@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   Param,
   ParseIntPipe,
@@ -22,7 +23,7 @@ import { CurrentUser } from 'src/auth/decorator/user.decorator';
 import { UserBaseInfo } from 'src/auth/type/user-base-info.type';
 import { CreateClubPayload } from './payload/create-club-payload';
 import { ClubService } from './club.service';
-import { ClubDto } from './dto/club.dto';
+import { ClubDto, ClubListDto } from './dto/club.dto';
 import { PutUpdateClubPayload } from './payload/put-update-club-payload';
 
 @Controller('clubs')
@@ -67,5 +68,15 @@ export class ClubController {
     @CurrentUser() user: UserBaseInfo,
   ): Promise<void> {
     return this.clubService.deleteClub(clubId, user);
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(200)
+  @ApiOperation({ summary: '클럽 목록을 조회합니다' })
+  @ApiOkResponse({ type: ClubListDto })
+  async getClubList(): Promise<ClubListDto> {
+    return this.clubService.getClubList();
   }
 }
