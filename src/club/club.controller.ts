@@ -76,9 +76,7 @@ export class ClubController {
   @HttpCode(200)
   @ApiOperation({ summary: '클럽 목록을 조회합니다' })
   @ApiOkResponse({ type: ClubListDto })
-  async getClubList(
-  ): Promise<ClubListDto> {
+  async getClubList(): Promise<ClubListDto> {
     return this.clubService.getClubList();
   }
-
 }

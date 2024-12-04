@@ -42,7 +42,7 @@ export class ClubDto {
     };
   }
 
-  static fromArray(clubs: ClubData[]) : ClubDto[] {
+  static fromArray(clubs: ClubData[]): ClubDto[] {
     return clubs.map((club) => this.from(club));
   }
 }
@@ -54,9 +54,9 @@ export class ClubListDto {
   })
   clubs!: ClubDto[];
 
-  static from(clubs: ClubDto[]) : ClubListDto {
+  static from(clubs: ClubDto[]): ClubListDto {
     return {
       clubs: ClubDto.fromArray(clubs),
-    }
+    };
   }
 }

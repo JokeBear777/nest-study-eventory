@@ -12,7 +12,6 @@ import { ClubDto, ClubListDto } from './dto/club.dto';
 import { PutUpdateClubPayload } from './payload/put-update-club-payload';
 import { UpdateClubData } from './type/update-club-data';
 
-
 @Injectable()
 export class ClubService {
   constructor(private readonly clubRepository: ClubRepository) {}
@@ -83,7 +82,7 @@ export class ClubService {
     await this.clubRepository.deleteClub(clubId, date);
   }
 
-  async getClubList() : Promise<ClubListDto> {
+  async getClubList(): Promise<ClubListDto> {
     const clubs = await this.clubRepository.getClubList();
     return ClubListDto.from(clubs);
   }
