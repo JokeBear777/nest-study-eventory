@@ -11,6 +11,7 @@ import { ClubRepository } from './club.repository';
 import { ClubDto } from './dto/club.dto';
 import { PutUpdateClubPayload } from './payload/put-update-club-payload';
 import { UpdateClubData } from './type/update-club-data';
+import type { EventRepository } from 'src/event/event.repository';
 
 @Injectable()
 export class ClubService {
@@ -64,5 +65,21 @@ export class ClubService {
     );
 
     return ClubDto.from(updatedClub);
+  }
+
+  async deleteClub(clubId: number, user: UserBaseInfo): Promise<void> {
+    const club = await this.clubRepository.getClubById(clubId);
+    if (!club) {
+      throw new NotFoundException('클럽이 존재하지 않습니다.');
+    }
+
+    const hostId = club.hostId;
+    if (hostId != user.id) {
+      throw new ForbiddenException('클럽장만 삭제할 수 있습니다.');
+    }
+
+    const date = new Date();
+
+    await this.clubRepository.deleteClub(clubId, date);
   }
 }

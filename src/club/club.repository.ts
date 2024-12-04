@@ -74,4 +74,38 @@ export class ClubRepository {
       },
     });
   }
+
+  async deleteClub(clubId: number, date: Date): Promise<void> {
+    await this.prisma.$transaction(async (prisma) => {
+      await prisma.event.deleteMany({
+        where: {
+          clubId: clubId,
+          OR: [{ startTime: { gte: date } }, { endTime: { lte: date } }],
+        },
+      });
+
+      await prisma.event.updateMany({
+        where: {
+          clubId: clubId,
+          AND: [{ startTime: { lt: date } }, { endTime: { gt: date } }],
+        },
+        data: {
+          clubId: null,
+          isArchived: true,
+        },
+      });
+
+      await prisma.clubMember.deleteMany({
+        where: {
+          clubId: clubId,
+        },
+      });
+
+      await prisma.club.delete({
+        where: {
+          id: clubId,
+        },
+      });
+    });
+  }
 }
