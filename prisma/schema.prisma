@@ -62,7 +62,7 @@ model Event {
   endTime     DateTime @map("end_time")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
-  isDetached  Boolean   @default(false) 
+  isArchived  Boolean  @map("is-archived") @default(false) 
 
   host     User     @relation(fields: [hostId], references: [id])
   category Category @relation(fields: [categoryId], references: [id])

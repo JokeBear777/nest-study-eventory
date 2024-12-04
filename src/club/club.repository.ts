@@ -98,7 +98,7 @@ export class ClubRepository {
         },
         data : {
           clubId: null,
-          isDetached : true,
+          isArchived : true,
         }
       });
 
