@@ -80,7 +80,6 @@ export class ClubService {
 
     const date = new Date();
 
-     await this.clubRepository.deleteClub(clubId, date); 
-    
+    await this.clubRepository.deleteClub(clubId, date);
   }
 }

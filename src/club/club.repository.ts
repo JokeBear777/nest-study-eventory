@@ -5,7 +5,6 @@ import { PrismaService } from 'src/common/services/prisma.service';
 import { Status } from '@prisma/client';
 import { UpdateClubData } from './type/update-club-data';
 
-
 @Injectable()
 export class ClubRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -81,25 +80,19 @@ export class ClubRepository {
       await prisma.event.deleteMany({
         where: {
           clubId: clubId,
-          OR: [
-            { startTime: { gte: date } }, 
-            { endTime: { lte: date } },  
-          ],
+          OR: [{ startTime: { gte: date } }, { endTime: { lte: date } }],
         },
-      })
+      });
 
       await prisma.event.updateMany({
         where: {
           clubId: clubId,
-          AND: [
-            { startTime: { lt: date } }, 
-            { endTime: { gt: date } },  
-          ],
+          AND: [{ startTime: { lt: date } }, { endTime: { gt: date } }],
         },
-        data : {
+        data: {
           clubId: null,
-          isArchived : true,
-        }
+          isArchived: true,
+        },
       });
 
       await prisma.clubMember.deleteMany({
@@ -107,16 +100,12 @@ export class ClubRepository {
           clubId: clubId,
         },
       });
-  
+
       await prisma.club.delete({
         where: {
           id: clubId,
         },
       });
-
     });
   }
 }
-
-  
-
