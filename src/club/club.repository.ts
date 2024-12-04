@@ -108,4 +108,16 @@ export class ClubRepository {
       });
     });
   }
+
+  async getClubList(): Promise<ClubData[]> {
+    return this.prisma.club.findMany({
+      select: {
+        id: true,
+        hostId: true,
+        name: true,
+        description: true,
+        maxPeople: true,
+      },
+    });
+  }
 }
