@@ -5,6 +5,7 @@ import { PrismaService } from 'src/common/services/prisma.service';
 import { Status } from '@prisma/client';
 import { UpdateClubData } from './type/update-club-data';
 
+
 @Injectable()
 export class ClubRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -75,31 +76,46 @@ export class ClubRepository {
     });
   }
 
-  async deleteClub(clubId: number): Promise<void> {
-    await this.prisma.clubMember.deleteMany({
-      where: {
-        clubId: clubId,
-      },
-    });
+  async deleteClub(clubId: number, date: Date): Promise<void> {
+    await this.prisma.$transaction(async (prisma) => {
+      await prisma.event.deleteMany({
+        where: {
+          clubId: clubId,
+          OR: [
+            { startTime: { gte: date } }, 
+            { endTime: { lte: date } },  
+          ],
+        },
+      })
 
-    await this.prisma.club.delete({
-      where: {
-        id: clubId,
-      },
+      await prisma.event.updateMany({
+        where: {
+          clubId: clubId,
+          AND: [
+            { startTime: { lt: date } }, 
+            { endTime: { gt: date } },  
+          ],
+        },
+        data : {
+          clubId: null,
+          isDetached : true,
+        }
+      });
+
+      await prisma.clubMember.deleteMany({
+        where: {
+          clubId: clubId,
+        },
+      });
+  
+      await prisma.club.delete({
+        where: {
+          id: clubId,
+        },
+      });
+
     });
   }
-
-  async unlinkEventsFromClub(clubId: number): Promise<void> {
-    await this.prisma.event.updateMany({
-      where : {
-        clubId : clubId,
-      },
-      data : {
-        clubId : null,
-      }
-    });
-  }
-
 }
 
   

@@ -78,8 +78,9 @@ export class ClubService {
       throw new ForbiddenException('클럽장만 삭제할 수 있습니다.');
     }
 
-    await this.clubRepository.unlinkEventsFromClub(clubId);
+    const date = new Date();
 
-    await this.clubRepository.deleteClub(clubId);
+     await this.clubRepository.deleteClub(clubId, date); 
+    
   }
 }
