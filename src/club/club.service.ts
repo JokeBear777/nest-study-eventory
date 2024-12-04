@@ -104,8 +104,8 @@ export class ClubService {
       throw new ForbiddenException('이미 가입한 클럽입니다');
     }
 
-    const eventHeadCount = await this.clubRepository.getClubHeadCount(clubId);
-    if (club.maxPeople === eventHeadCount) {
+    const clubHeadCount = await this.clubRepository.getClubHeadCount(clubId);
+    if (club.maxPeople === clubHeadCount) {
       throw new ConflictException('클럽 인원이 가득차 참가할 수 없습니다');
     }
 
