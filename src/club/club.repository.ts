@@ -155,4 +155,28 @@ export class ClubRepository {
       },
     });
   }
+
+  async isParticipatingClubEvent(clubId: number, userId:number) : Promise<boolean> {
+    const participation = await this.prisma.eventJoin.findFirst({
+      where: {
+        event: {
+          clubId: clubId,
+        },
+        userId: userId,
+      },
+    });
+
+    return participation === null;  
+  }
+
+  async outClub(clubId: number, userId: number): Promise<void> {
+    await this.prisma.clubMember.delete({
+      where: {
+        clubId_userId: {
+          clubId: clubId,
+          userId: userId,
+        },
+      },
+    });
+  }
 }
