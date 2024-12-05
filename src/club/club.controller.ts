@@ -79,4 +79,17 @@ export class ClubController {
   async getClubList(): Promise<ClubListDto> {
     return this.clubService.getClubList();
   }
+
+  @Post(':clubId/join')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(204)
+  @ApiOperation({ summary: '유저가 클럽에 가입 신청합니다' })
+  @ApiNoContentResponse()
+  async joinClub(
+    @Param('clubId', ParseIntPipe) clubId: number,
+    @CurrentUser() user: UserBaseInfo,
+  ): Promise<void> {
+    return this.clubService.joinClub(clubId, user);
+  }
 }

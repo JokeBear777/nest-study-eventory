@@ -120,4 +120,39 @@ export class ClubRepository {
       },
     });
   }
+
+  async getClubMemberStatus(
+    clubId: number,
+    userId: number,
+  ): Promise<Status | null> {
+    const result = await this.prisma.clubMember.findUnique({
+      where: {
+        clubId_userId: {
+          clubId,
+          userId,
+        },
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    return result?.status ?? null;
+  }
+
+  async joinClub(clubId: number, userId: number): Promise<void> {
+    this.prisma.clubMember.create({
+      data: {
+        clubId: clubId,
+        userId: userId,
+      },
+      select: {
+        id: true,
+        clubId: true,
+        userId: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
 }

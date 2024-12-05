@@ -11,6 +11,7 @@ import { ClubRepository } from './club.repository';
 import { ClubDto, ClubListDto } from './dto/club.dto';
 import { PutUpdateClubPayload } from './payload/put-update-club-payload';
 import { UpdateClubData } from './type/update-club-data';
+import { Status } from '@prisma/client';
 
 @Injectable()
 export class ClubService {
@@ -85,5 +86,29 @@ export class ClubService {
   async getClubList(): Promise<ClubListDto> {
     const clubs = await this.clubRepository.getClubList();
     return ClubListDto.from(clubs);
+  }
+
+  async joinClub(clubId: number, user: UserBaseInfo): Promise<void> {
+    const club = await this.clubRepository.getClubById(clubId);
+    if (!club) {
+      throw new NotFoundException('클럽이 존재하지 않습니다.');
+    }
+
+    const memberStatus = await this.clubRepository.getClubMemberStatus(
+      clubId,
+      user.id,
+    );
+    if (memberStatus == Status.PENDING) {
+      throw new ForbiddenException('클럽 가입 신청이 이미 진행 중입니다');
+    } else if (memberStatus == Status.APPROVED || Status.LEADER) {
+      throw new ForbiddenException('이미 가입한 클럽입니다');
+    }
+
+    const clubHeadCount = await this.clubRepository.getClubHeadCount(clubId);
+    if (club.maxPeople === clubHeadCount) {
+      throw new ConflictException('클럽 인원이 가득차 참가할 수 없습니다');
+    }
+
+    await this.clubRepository.joinClub(clubId, user.id);
   }
 }
