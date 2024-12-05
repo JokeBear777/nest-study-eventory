@@ -136,6 +136,7 @@ export class ClubService {
       throw new ConflictException('클럽 모임 모두 탈퇴 후 클럽에서 탈퇴할 수 있습니다.');
     }
 
-    await this.clubRepository.outClub(clubId, user.id);
+    const date = new Date();
+    await this.clubRepository.outClub(clubId, user.id, date);
   }
 }
