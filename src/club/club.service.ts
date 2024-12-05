@@ -131,11 +131,6 @@ export class ClubService {
       throw new ConflictException('가입하지 않은 클럽은 탈퇴할 수 없습니다.');
     }
 
-    const isParticipatingClubEvent = await this.clubRepository.isParticipatingClubEvent(clubId, user.id);
-    if (isParticipatingClubEvent) {
-      throw new ConflictException('클럽 모임 모두 탈퇴 후 클럽에서 탈퇴할 수 있습니다.');
-    }
-
     const date = new Date();
     await this.clubRepository.outClub(clubId, user.id, date);
   }

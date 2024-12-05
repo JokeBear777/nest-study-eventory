@@ -156,19 +156,6 @@ export class ClubRepository {
     });
   }
 
-  async isParticipatingClubEvent(clubId: number, userId:number) : Promise<boolean> {
-    const participation = await this.prisma.eventJoin.findFirst({
-      where: {
-        event: {
-          clubId: clubId,
-        },
-        userId: userId,
-      },
-    });
-
-    return participation === null;  
-  }
-
   async outClub(clubId: number, userId: number, date: Date): Promise<void> {
     await this.prisma.$transaction(async (prisma) => {
 
