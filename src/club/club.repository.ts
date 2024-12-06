@@ -163,7 +163,6 @@ export class ClubRepository {
         where: {
           event: {
             clubId : clubId,
-            hostId: { not: userId },
             startTime: { gt: date }, 
           },
           userId : userId,
