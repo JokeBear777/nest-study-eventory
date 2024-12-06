@@ -228,10 +228,7 @@ export class ClubRepository {
     });
   }
 
-  async rejectApplicants(
-    clubId: number,
-    userIds: number[],
-  ): Promise<void> {
+  async rejectApplicants(clubId: number, userIds: number[]): Promise<void> {
     await this.prisma.clubMember.deleteMany({
       where: {
         clubId: clubId,

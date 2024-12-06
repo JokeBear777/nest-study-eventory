@@ -135,5 +135,4 @@ export class ClubController {
   ): Promise<void> {
     return this.clubService.rejectApplicants(clubId, user, payload);
   }
-
 }
