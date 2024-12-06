@@ -196,4 +196,35 @@ export class ClubRepository {
       });
     });
   }
+
+  async hasInvalidUsers(clubId: number, userIds: number[]): Promise<boolean> {
+    const InvalidUser = await this.prisma.clubMember.findFirst({
+      where: {
+        clubId: clubId,
+        userId: { in: userIds },
+        OR: [
+          { status: { not: Status.PENDING } },
+          {
+            user: {
+              deletedAt: { not: null },
+            },
+          },
+        ],
+      },
+    });
+
+    return !!InvalidUser;
+  }
+
+  async approveApplicants(clubId: number, userIds: number[]): Promise<void> {
+    await this.prisma.clubMember.updateMany({
+      where: {
+        clubId: clubId,
+        userId: { in: userIds },
+      },
+      data: {
+        status: Status.APPROVED,
+      },
+    });
+  }
 }
