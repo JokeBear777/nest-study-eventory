@@ -158,14 +158,13 @@ export class ClubRepository {
 
   async outClub(clubId: number, userId: number, date: Date): Promise<void> {
     await this.prisma.$transaction(async (prisma) => {
-
       await prisma.eventJoin.deleteMany({
         where: {
           event: {
-            clubId : clubId,
-            startTime: { gt: date }, 
+            clubId: clubId,
+            startTime: { gt: date },
           },
-          userId : userId,
+          userId: userId,
         },
       });
 
@@ -173,20 +172,20 @@ export class ClubRepository {
         where: {
           event: {
             clubId: clubId,
-            hostId: userId ,
-            startTime: { gt: date }, 
+            hostId: userId,
+            startTime: { gt: date },
           },
         },
       });
 
       await prisma.event.deleteMany({
         where: {
-          clubId :clubId,
+          clubId: clubId,
           hostId: userId,
-          startTime: { gt: date }, 
+          startTime: { gt: date },
         },
       });
-  
+
       await prisma.clubMember.delete({
         where: {
           clubId_userId: {
@@ -195,8 +194,6 @@ export class ClubRepository {
           },
         },
       });
-
     });
   }
-  
 }

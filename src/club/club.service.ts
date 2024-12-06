@@ -100,7 +100,7 @@ export class ClubService {
     );
     if (memberStatus == Status.PENDING) {
       throw new ForbiddenException('클럽 가입 신청이 이미 진행 중입니다');
-    } 
+    }
     if (memberStatus == Status.APPROVED || Status.LEADER) {
       throw new ForbiddenException('이미 가입한 클럽입니다');
     }
