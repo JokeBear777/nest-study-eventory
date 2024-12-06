@@ -146,11 +146,10 @@ export class ClubService {
       throw new NotFoundException('클럽이 존재하지 않습니다.');
     }
 
-    const hasInvalidUsers =
-      await this.clubRepository.hasInvalidUsers(
-        clubId,
-        payload.userIds,
-      );
+    const hasInvalidUsers = await this.clubRepository.hasInvalidUsers(
+      clubId,
+      payload.userIds,
+    );
     if (hasInvalidUsers) {
       throw new ConflictException(
         '승인 대기 중이 아니거나 탈퇴한 사용자가 포함되어 있습니다.',
