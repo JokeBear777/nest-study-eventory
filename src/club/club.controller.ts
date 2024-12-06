@@ -26,6 +26,7 @@ import { ClubService } from './club.service';
 import { ClubDto, ClubListDto } from './dto/club.dto';
 import { PutUpdateClubPayload } from './payload/put-update-club-payload';
 import { ApproveApplicantsPayload } from './payload/approve-applicants.payload';
+import { RejectApplicantsPayload } from './payload/reject-applicants-payload';
 
 @Controller('clubs')
 @ApiTags('club API')
@@ -120,4 +121,19 @@ export class ClubController {
   ): Promise<void> {
     return this.clubService.approveApplicants(clubId, user, payload);
   }
+
+  @Post(':clubId/applicants/reject')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(204)
+  @ApiOperation({ summary: '특정 유저의 클럽 가입 신청을 거절합니다' })
+  @ApiNoContentResponse()
+  async rejectApplicants(
+    @Param('clubId', ParseIntPipe) clubId: number,
+    @CurrentUser() user: UserBaseInfo,
+    @Body() payload: RejectApplicantsPayload,
+  ): Promise<void> {
+    return this.clubService.rejectApplicants(clubId, user, payload);
+  }
+
 }
