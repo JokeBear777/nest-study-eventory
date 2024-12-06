@@ -100,7 +100,8 @@ export class ClubService {
     );
     if (memberStatus == Status.PENDING) {
       throw new ForbiddenException('클럽 가입 신청이 이미 진행 중입니다');
-    } else if (memberStatus == Status.APPROVED || Status.LEADER) {
+    }
+    if (memberStatus == Status.APPROVED || Status.LEADER) {
       throw new ForbiddenException('이미 가입한 클럽입니다');
     }
 
@@ -110,5 +111,27 @@ export class ClubService {
     }
 
     await this.clubRepository.joinClub(clubId, user.id);
+  }
+
+  async outClub(clubId: number, user: UserBaseInfo): Promise<void> {
+    const club = await this.clubRepository.getClubById(clubId);
+    if (!club) {
+      throw new NotFoundException('클럽이 존재하지 않습니다.');
+    }
+
+    if (user.id === club.hostId) {
+      throw new ForbiddenException('클럽장은 클럽에서 탈퇴할 수 없습니다.');
+    }
+
+    const memberStatus = await this.clubRepository.getClubMemberStatus(
+      clubId,
+      user.id,
+    );
+    if (memberStatus === null) {
+      throw new ConflictException('가입하지 않은 클럽은 탈퇴할 수 없습니다.');
+    }
+
+    const date = new Date();
+    await this.clubRepository.outClub(clubId, user.id, date);
   }
 }

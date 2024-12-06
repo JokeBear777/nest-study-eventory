@@ -92,4 +92,17 @@ export class ClubController {
   ): Promise<void> {
     return this.clubService.joinClub(clubId, user);
   }
+
+  @Post(':clubId/out')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(204)
+  @ApiOperation({ summary: '유저가 클럽에서 탈퇴합니다' })
+  @ApiNoContentResponse()
+  async outClub(
+    @Param('clubId', ParseIntPipe) clubId: number,
+    @CurrentUser() user: UserBaseInfo,
+  ): Promise<void> {
+    return this.clubService.outClub(clubId, user);
+  }
 }
