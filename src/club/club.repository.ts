@@ -4,7 +4,6 @@ import { ClubData } from './type/club-data';
 import { PrismaService } from 'src/common/services/prisma.service';
 import { Status } from '@prisma/client';
 import { UpdateClubData } from './type/update-club-data';
-import { ApproveApplicantsData } from './type/approve-applicants-data';
 
 @Injectable()
 export class ClubRepository {
@@ -198,27 +197,36 @@ export class ClubRepository {
     });
   }
 
-  async countClubPendingMembersById(
+  async hasInvalidUsers(
     clubId: number,
     userIds: number[],
-  ): Promise<number> {
-    return this.prisma.clubMember.count({
+  ): Promise<boolean> {
+    const InvalidUser = await this.prisma.clubMember.findFirst({
       where: {
         clubId: clubId,
         userId: { in: userIds },
-        status: Status.PENDING,
+        OR : [
+          { status: {not : Status.PENDING}},
+          {
+            user: {
+              deletedAt: { not: null }
+            },
+          },
+        ],
       },
     });
+
+    return !!InvalidUser;
   }
 
   async approveApplicants(
     clubId: number,
-    data: ApproveApplicantsData,
+    userIds: number[],
   ): Promise<void> {
     await this.prisma.clubMember.updateMany({
       where: {
         clubId: clubId,
-        userId: { in: data.userIds },
+        userId: { in: userIds },
       },
       data: {
         status: Status.APPROVED,

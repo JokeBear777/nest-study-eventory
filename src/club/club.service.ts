@@ -13,7 +13,6 @@ import { PutUpdateClubPayload } from './payload/put-update-club-payload';
 import { UpdateClubData } from './type/update-club-data';
 import { Status } from '@prisma/client';
 import { ApproveApplicantsPayload } from './payload/approve-applicants.payload';
-import { ApproveApplicantsData } from './type/approve-applicants-data';
 
 @Injectable()
 export class ClubService {
@@ -147,14 +146,14 @@ export class ClubService {
       throw new NotFoundException('클럽이 존재하지 않습니다.');
     }
 
-    const clubPendingMemberCount =
-      await this.clubRepository.countClubPendingMembersById(
+    const hasInvalidUsers =
+      await this.clubRepository.hasInvalidUsers(
         clubId,
         payload.userIds,
       );
-    if (clubPendingMemberCount != payload.userIds.length) {
+    if (hasInvalidUsers) {
       throw new ConflictException(
-        '요청한 사용자 중 승인 대기 상태가 아닌 유저가 포함되어 있습니다',
+        '승인 대기 중이 아니거나 탈퇴한 사용자가 포함되어 있습니다.',
       );
     }
 
@@ -163,6 +162,7 @@ export class ClubService {
       throw new ForbiddenException('클럽장만 가입 승인 할 수 있습니다.');
     }
 
+    const clubPendingMemberCount = payload.userIds.length;
     const clubtHeadCount = await this.clubRepository.getClubHeadCount(clubId);
     const totalHeadCount = clubPendingMemberCount + clubtHeadCount;
     if (totalHeadCount > club.maxPeople) {
@@ -172,10 +172,6 @@ export class ClubService {
       );
     }
 
-    const data: ApproveApplicantsData = {
-      userIds: payload.userIds,
-    };
-
-    await this.clubRepository.approveApplicants(clubId, data);
+    await this.clubRepository.approveApplicants(clubId, payload.userIds);
   }
 }
