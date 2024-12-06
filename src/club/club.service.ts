@@ -12,6 +12,8 @@ import { ClubDto, ClubListDto } from './dto/club.dto';
 import { PutUpdateClubPayload } from './payload/put-update-club-payload';
 import { UpdateClubData } from './type/update-club-data';
 import { Status } from '@prisma/client';
+import { ApproveApplicantsPayload } from './payload/approve-applicants.payload';
+import { ApproveApplicantsData } from './type/approve-applicants-data';
 
 @Injectable()
 export class ClubService {
@@ -133,5 +135,47 @@ export class ClubService {
 
     const date = new Date();
     await this.clubRepository.outClub(clubId, user.id, date);
+  }
+
+  async approveApplicants(
+    clubId: number,
+    user: UserBaseInfo,
+    payload: ApproveApplicantsPayload,
+  ): Promise<void> {
+    const club = await this.clubRepository.getClubById(clubId);
+    if (!club) {
+      throw new NotFoundException('클럽이 존재하지 않습니다.');
+    }
+
+    const clubPendingMemberCount =
+      await this.clubRepository.countClubPendingMembersById(
+        clubId,
+        payload.userIds,
+      );
+    if (clubPendingMemberCount != payload.userIds.length) {
+      throw new ConflictException(
+        '요청한 사용자 중 승인 대기 상태가 아닌 유저가 포함되어 있습니다',
+      );
+    }
+
+    const hostId = club.hostId;
+    if (hostId != user.id) {
+      throw new ForbiddenException('클럽장만 가입 승인 할 수 있습니다.');
+    }
+
+    const clubtHeadCount = await this.clubRepository.getClubHeadCount(clubId);
+    const totalHeadCount = clubPendingMemberCount + clubtHeadCount;
+    if (totalHeadCount > club.maxPeople) {
+      const overCapacity = totalHeadCount - club.maxPeople;
+      throw new ConflictException(
+        `클럽 인원이 가득 찼습니다. 승인 시 ${overCapacity}명이 초과됩니다.`,
+      );
+    }
+
+    const data: ApproveApplicantsData = {
+      userIds: payload.userIds,
+    };
+
+    await this.clubRepository.approveApplicants(clubId, data);
   }
 }

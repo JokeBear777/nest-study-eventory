@@ -4,6 +4,7 @@ import { ClubData } from './type/club-data';
 import { PrismaService } from 'src/common/services/prisma.service';
 import { Status } from '@prisma/client';
 import { UpdateClubData } from './type/update-club-data';
+import { ApproveApplicantsData } from './type/approve-applicants-data';
 
 @Injectable()
 export class ClubRepository {
@@ -194,6 +195,34 @@ export class ClubRepository {
           },
         },
       });
+    });
+  }
+
+  async countClubPendingMembersById(
+    clubId: number,
+    userIds: number[],
+  ): Promise<number> {
+    return this.prisma.clubMember.count({
+      where: {
+        clubId: clubId,
+        userId: { in: userIds },
+        status: Status.PENDING,
+      },
+    });
+  }
+
+  async approveApplicants(
+    clubId: number,
+    data: ApproveApplicantsData,
+  ): Promise<void> {
+    await this.prisma.clubMember.updateMany({
+      where: {
+        clubId: clubId,
+        userId: { in: data.userIds },
+      },
+      data: {
+        status: Status.APPROVED,
+      },
     });
   }
 }
