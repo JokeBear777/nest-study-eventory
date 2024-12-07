@@ -244,7 +244,7 @@ export class ClubRepository {
         clubId: clubId,
         status: Status.PENDING,
         user: {
-          deletedAt: { not: null },
+          deletedAt: null,
         },
       },
       select: {

@@ -220,8 +220,8 @@ export class ClubService {
       );
     }
 
-    const ClubMembers = await this.clubRepository.getClubApplicants(clubId);
+    const clubApplicants = await this.clubRepository.getClubApplicants(clubId);
 
-    return ClubMemberListDto.from(ClubMembers);
+    return ClubMemberListDto.from(clubApplicants);
   }
 }
