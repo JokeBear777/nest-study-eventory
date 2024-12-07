@@ -255,4 +255,42 @@ export class ClubRepository {
       },
     });
   }
+  async updateClubHost(
+    clubId: number,
+    hostId: number,
+    nextHostId: number,
+  ): Promise<any> {
+    await this.prisma.$transaction(async (prisma) => {
+      const updatedClub = await prisma.club.update({
+       where: { id: clubId },
+       data: {
+         hostId: nextHostId,
+        },
+      });
+
+      await prisma.clubMember.updateMany({
+        where: {
+          clubId: clubId,
+          userId: hostId,
+        },
+        data: {
+          status: Status.APPROVED,
+        },
+      });
+
+      await prisma.clubMember.updateMany({
+        where: {
+          clubId: clubId,
+          userId: nextHostId,
+        },
+        data: {
+          status: Status.LEADER,
+        },
+      });
+
+      return updatedClub;
+
+    });
+  }
+
 }

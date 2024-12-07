@@ -6,6 +6,7 @@ import {
   HttpCode,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Put,
   UseGuards,
@@ -28,6 +29,7 @@ import { PutUpdateClubPayload } from './payload/put-update-club-payload';
 import { ApproveApplicantsPayload } from './payload/approve-applicants.payload';
 import { RejectApplicantsPayload } from './payload/reject-applicants-payload';
 import { ClubMemberListDto } from './dto/club-member.dto';
+import { UpdateClubHostPayload } from './payload/update-club-host-payload';
 
 @Controller('clubs')
 @ApiTags('club API')
@@ -147,5 +149,18 @@ export class ClubController {
     @CurrentUser() user: UserBaseInfo,
   ): Promise<ClubMemberListDto> {
     return this.clubService.getClubApplicants(clubId, user);
+  }
+
+  @Patch(':clubId/host')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '클럽장을 위임한다' })
+  @ApiNoContentResponse()
+  async updateClubHost(
+    @Param('clubId', ParseIntPipe) clubId: number,
+    @CurrentUser() user: UserBaseInfo,
+    @Body() payload: UpdateClubHostPayload,
+  ): Promise<ClubDto> {
+    return this.clubService.updateClubHost(clubId, user, payload);
   }
 }
