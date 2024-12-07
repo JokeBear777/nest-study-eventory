@@ -4,6 +4,7 @@ import { ClubData } from './type/club-data';
 import { PrismaService } from 'src/common/services/prisma.service';
 import { Status } from '@prisma/client';
 import { UpdateClubData } from './type/update-club-data';
+import { ClubMemberData } from './type/club-member-data';
 
 @Injectable()
 export class ClubRepository {
@@ -236,4 +237,23 @@ export class ClubRepository {
       },
     });
   }
+
+  async getClubApplicants(clubId: number): Promise<ClubMemberData[]> {
+    return await this.prisma.clubMember.findMany({
+      where: {
+        clubId: clubId,
+        status: Status.PENDING,
+        user: {
+          deletedAt: { not: null },
+        },
+      },
+      select: {
+        id: true,
+        clubId: true,
+        userId: true,
+        status: true,
+      },
+    });
+  }
+
 }
