@@ -35,6 +35,13 @@ export class EventService {
       throw new NotFoundException('일부 지역이 존재하지 않습니다.');
     }
 
+    if (payload.clubId != null) {
+      const club = await this.eventRepository.getClubById(payload.clubId);
+      if (!category) {
+        throw new NotFoundException('클럽이 존재하지 않습니다.');
+      }
+   }
+
     const now = new Date();
 
     if (payload.startTime < now || payload.endTime < now) {
@@ -53,6 +60,7 @@ export class EventService {
       description: payload.description,
       categoryId: payload.categoryId,
       cityIds: payload.cityIds,
+      clubId : payload.clubId,
       startTime: payload.startTime,
       endTime: payload.endTime,
       maxPeople: payload.maxPeople,

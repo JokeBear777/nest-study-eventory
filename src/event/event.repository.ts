@@ -2,11 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/services/prisma.service';
 import { CreateEventData } from './type/create-event-data.type';
 import { EventData } from './type/event-data';
-import { Category, City, User } from '@prisma/client';
+import { Category, City, User, type Club } from '@prisma/client';
 import { EventQuery } from './query/event.query';
-import { UpdateEventJoinPayload } from './payload/update-event-join-payload';
 import { UpdateEventData } from './type/update-event-data';
-import { UserBaseInfo } from 'src/auth/type/user-base-info.type';
+
 
 @Injectable()
 export class EventRepository {
@@ -302,6 +301,14 @@ export class EventRepository {
             cityId: true,
           },
         },
+      },
+    });
+  }
+
+  async getClubById(clubId: number): Promise<Club | null> {
+    return this.prisma.club.findUnique({
+      where: {
+        id: clubId,
       },
     });
   }
