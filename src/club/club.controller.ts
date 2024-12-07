@@ -27,6 +27,7 @@ import { ClubDto, ClubListDto } from './dto/club.dto';
 import { PutUpdateClubPayload } from './payload/put-update-club-payload';
 import { ApproveApplicantsPayload } from './payload/approve-applicants.payload';
 import { RejectApplicantsPayload } from './payload/reject-applicants-payload';
+import { ClubMemberListDto } from './dto/club-member.dto';
 
 @Controller('clubs')
 @ApiTags('club API')
@@ -134,5 +135,17 @@ export class ClubController {
     @Body() payload: RejectApplicantsPayload,
   ): Promise<void> {
     return this.clubService.rejectApplicants(clubId, user, payload);
+  }
+
+  @Get(':clubId/applicants')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '클럽 가입 신청자 조회' })
+  @ApiOkResponse({ type: ClubMemberListDto })
+  async getClubApplicants(
+    @Param('clubId', ParseIntPipe) clubId: number,
+    @CurrentUser() user: UserBaseInfo,
+  ): Promise<ClubMemberListDto> {
+    return this.clubService.getClubApplicants(clubId, user);
   }
 }

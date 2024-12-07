@@ -14,6 +14,7 @@ import { UpdateClubData } from './type/update-club-data';
 import { Status } from '@prisma/client';
 import { ApproveApplicantsPayload } from './payload/approve-applicants.payload';
 import { RejectApplicantsPayload } from './payload/reject-applicants-payload';
+import { ClubMemberListDto } from './dto/club-member.dto';
 
 @Injectable()
 export class ClubService {
@@ -201,5 +202,26 @@ export class ClubService {
     }
 
     await this.clubRepository.rejectApplicants(clubId, payload.userIds);
+  }
+
+  async getClubApplicants(
+    clubId: number,
+    user: UserBaseInfo,
+  ): Promise<ClubMemberListDto> {
+    const club = await this.clubRepository.getClubById(clubId);
+    if (!club) {
+      throw new NotFoundException('클럽이 존재하지 않습니다.');
+    }
+
+    const hostId = club.hostId;
+    if (hostId != user.id) {
+      throw new ForbiddenException(
+        '클럽장만 가입신청자를 조회 할 수 있습니다.',
+      );
+    }
+
+    const clubApplicants = await this.clubRepository.getClubApplicants(clubId);
+
+    return ClubMemberListDto.from(clubApplicants);
   }
 }
