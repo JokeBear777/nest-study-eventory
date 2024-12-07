@@ -25,6 +25,15 @@ export class EventQuery {
   @IsInt()
   @Type(() => Number)
   @ApiPropertyOptional({
+    description: '클럽 ID',
+    type: Number,
+  })
+  clubId?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Type(() => Number)
+  @ApiPropertyOptional({
     description: '카테고리 ID',
     type: Number,
   })

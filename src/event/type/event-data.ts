@@ -4,6 +4,7 @@ export type EventData = {
   title: string;
   description: string;
   categoryId: number;
+  clubId: number | null;
   startTime: Date;
   endTime: Date;
   maxPeople: number;
@@ -11,4 +12,5 @@ export type EventData = {
     id: number;
     cityId: number;
   }[];
+  isArchived: boolean;
 };

@@ -60,10 +60,15 @@ export class EventController {
 
   @Get()
   @HttpCode(200)
-  @ApiOperation({ summary: '특정 id의 모임 데이터를 가져옵니다.' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '특정 모임 데이터를 가져옵니다.' })
   @ApiOkResponse({ type: EventListDto })
-  async getEvents(@Query() query: EventQuery): Promise<EventListDto> {
-    return this.eventService.getEvents(query);
+  async getEvents(
+    @Query() query: EventQuery,
+    @CurrentUser() user: UserBaseInfo,
+  ): Promise<EventListDto> {
+    return this.eventService.getEvents(query, user);
   }
 
   @Post(':eventId/join')

@@ -39,9 +39,11 @@ export class EventRepository {
         title: true,
         description: true,
         categoryId: true,
+        clubId: true,
         startTime: true,
         endTime: true,
         maxPeople: true,
+        isArchived: true,
         eventCity: {
           select: {
             id: true,
@@ -96,9 +98,11 @@ export class EventRepository {
         title: true,
         description: true,
         categoryId: true,
+        clubId: true,
         startTime: true,
         endTime: true,
         maxPeople: true,
+        isArchived: true,
         eventCity: {
           select: {
             id: true,
@@ -109,10 +113,24 @@ export class EventRepository {
     });
   }
 
-  async getEvents(query: EventQuery): Promise<EventData[]> {
+  async getEvents(query: EventQuery, userId: number): Promise<EventData[]> {
     return this.prisma.event.findMany({
       where: {
-        hostId: query.hostId,
+        OR: [
+          { isArchived: false }, // isArchived가 false인 이벤트
+          {
+            isArchived: true, // isArchived가 true인 이벤트 중
+            eventJoin: {
+              some: { userId: userId }, // 해당 유저가 참여한 이벤트
+            },
+          },
+        ],
+        ...(query.hostId && {
+          host: {
+            id: query.hostId,
+            deletedAt: null,
+          },
+        }),
         ...(query.cityId && {
           eventCity: {
             some: {
@@ -120,7 +138,12 @@ export class EventRepository {
             },
           },
         }),
-        categoryId: query.categoryId,
+        ...(query.categoryId && {
+          categoryId: query.categoryId,
+        }),
+        ...(query.clubId && {
+          clubId: query.clubId,
+        }),
       },
       select: {
         id: true,
@@ -128,9 +151,11 @@ export class EventRepository {
         title: true,
         description: true,
         categoryId: true,
+        clubId: true,
         startTime: true,
         endTime: true,
         maxPeople: true,
+        isArchived: true,
         eventCity: {
           select: {
             id: true,
@@ -222,9 +247,11 @@ export class EventRepository {
         title: true,
         description: true,
         categoryId: true,
+        clubId: true,
         startTime: true,
         endTime: true,
         maxPeople: true,
+        isArchived: true,
         eventCity: {
           select: {
             id: true,
@@ -264,15 +291,17 @@ export class EventRepository {
         title: true,
         description: true,
         categoryId: true,
+        clubId: true,
+        startTime: true,
+        endTime: true,
+        maxPeople: true,
+        isArchived: true,
         eventCity: {
           select: {
             id: true,
             cityId: true,
           },
         },
-        startTime: true,
-        endTime: true,
-        maxPeople: true,
       },
     });
   }

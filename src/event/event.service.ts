@@ -13,6 +13,7 @@ import { UpdateEventJoinPayload } from './payload/update-event-join-payload';
 import { PutUpdateEventPayload } from './payload/put-update-event-payload';
 import { UpdateEventData } from './type/update-event-data';
 import { UserBaseInfo } from 'src/auth/type/user-base-info.type';
+import { EventData } from './type/event-data';
 
 @Injectable()
 export class EventService {
@@ -72,8 +73,8 @@ export class EventService {
     return EventDto.from(event);
   }
 
-  async getEvents(query: EventQuery): Promise<EventListDto> {
-    const events = await this.eventRepository.getEvents(query);
+  async getEvents(query: EventQuery, user: UserBaseInfo): Promise<EventListDto> {
+    const events = await this.eventRepository.getEvents(query, user.id);
     return EventListDto.from(events);
   }
 
