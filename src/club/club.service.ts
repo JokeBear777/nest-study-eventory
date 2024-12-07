@@ -13,6 +13,7 @@ import { PutUpdateClubPayload } from './payload/put-update-club-payload';
 import { UpdateClubData } from './type/update-club-data';
 import { Status } from '@prisma/client';
 import { ApproveApplicantsPayload } from './payload/approve-applicants.payload';
+import { RejectApplicantsPayload } from './payload/reject-applicants-payload';
 
 @Injectable()
 export class ClubService {
@@ -172,5 +173,33 @@ export class ClubService {
     }
 
     await this.clubRepository.approveApplicants(clubId, payload.userIds);
+  }
+
+  async rejectApplicants(
+    clubId: number,
+    user: UserBaseInfo,
+    payload: RejectApplicantsPayload,
+  ): Promise<void> {
+    const club = await this.clubRepository.getClubById(clubId);
+    if (!club) {
+      throw new NotFoundException('클럽이 존재하지 않습니다.');
+    }
+
+    const hasInvalidUsers = await this.clubRepository.hasInvalidUsers(
+      clubId,
+      payload.userIds,
+    );
+    if (hasInvalidUsers) {
+      throw new ConflictException(
+        '승인 대기 중이 아니거나 탈퇴한 사용자가 포함되어 있습니다.',
+      );
+    }
+
+    const hostId = club.hostId;
+    if (hostId != user.id) {
+      throw new ForbiddenException('클럽장만 가입 거절 할 수 있습니다.');
+    }
+
+    await this.clubRepository.rejectApplicants(clubId, payload.userIds);
   }
 }
