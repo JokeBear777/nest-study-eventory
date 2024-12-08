@@ -262,8 +262,7 @@ export class ClubRepository {
         hostId: nextHostId,
       },
     });
-  
+
     return updatedClub;
   }
-
 }
