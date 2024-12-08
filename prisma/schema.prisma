@@ -181,7 +181,6 @@ model ClubMember {
 enum Status {
   PENDING
   APPROVED
-  LEADER
 
   @@map("status")
 }
