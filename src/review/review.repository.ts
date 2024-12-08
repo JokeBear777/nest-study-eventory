@@ -98,26 +98,22 @@ export class ReviewRepository {
   async getReviews(query: ReviewQuery, userId: number): Promise<ReviewData[]> {
     return this.prisma.review.findMany({
       where: {
-        ...(query.eventId && 
-          { eventId: query.eventId,
-            event: {
-              OR: [
+        eventId: query.eventId,
+        event: {
+          OR: [
                 { isArchived: false }, 
                 {
                   isArchived: true, 
                   eventJoin: {
-                    some: { userId: userId }, 
+                  some: { userId: userId }, 
                   },
                 },
-              ],
-            },
-          }), 
-        ...(query.userId && {
-          user: {
-            deletedAt: null,
-            id: query.userId, 
-          },
-        }),
+          ],
+        }, 
+        user: {
+          deletedAt: null,
+          id: query.userId, 
+        },
       },
       select: {
         id: true,

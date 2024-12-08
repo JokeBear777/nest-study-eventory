@@ -65,7 +65,7 @@ export class EventService {
       description: payload.description,
       categoryId: payload.categoryId,
       cityIds: payload.cityIds,
-      clubId : payload.clubId,
+      clubId: payload.clubId ?? null,
       startTime: payload.startTime,
       endTime: payload.endTime,
       maxPeople: payload.maxPeople,
@@ -83,6 +83,13 @@ export class EventService {
       throw new NotFoundException('event가 존재하지 않습니다.');
     }
 
+    if (event.clubId != null) {
+      const isUserClubMember = await this.eventRepository.isClubMember(event.clubId, user.id);
+      if (!isUserClubMember) {
+        throw new ForbiddenException('클럽모임은 클럽원만 조회할 수 있습니다 ');
+      }
+    }
+
     if (event.isArchived === true) {
       const isUserJoinedEvent = await this.eventRepository.isUserJoinedEvent(eventId, user.id);
       throw new ForbiddenException('삭제된 클럽의 클럽모임은 참여자만 조회할 수 있습니다 ');
@@ -92,8 +99,31 @@ export class EventService {
   }
 
   async getEvents(query: EventQuery, user: UserBaseInfo): Promise<EventListDto> {
+    
+    if (query.clubId) {
+      const isUserClubMember = await this.eventRepository.isClubMember(query.clubId, user.id);
+      if (!isUserClubMember) {
+        throw new ForbiddenException('클럽모임은 클럽원만 조회할 수 있습니다 ');
+      }
+    }
+ 
     const events = await this.eventRepository.getEvents(query, user.id);
-    return EventListDto.from(events);
+
+    const filteredEvents: EventData[] = [];
+
+    for (const event of events) {
+      if (!event.isArchived) {
+       filteredEvents.push(event);
+      } 
+      if (event.isArchived) {
+        const isJoined = await this.eventRepository.isUserJoinedEvent(event.id, user.id);
+        if (isJoined) {
+          filteredEvents.push(event);
+        }
+      } 
+    }
+
+    return EventListDto.from(filteredEvents);
   }
 
   async joinEvent(eventId: number, user: UserBaseInfo): Promise<void> {

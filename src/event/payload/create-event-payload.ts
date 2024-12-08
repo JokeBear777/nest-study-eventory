@@ -47,7 +47,7 @@ export class CreateEventPayload {
     type: Number,
     nullable: true,
   })
-  clubId!: number | null;
+  clubId?: number | null;
 
   @IsArray()
   @ArrayNotEmpty()

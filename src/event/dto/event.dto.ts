@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { EventData } from '../type/event-data';
-import { boolean } from 'joi';
+
+
 
 export class EventDto {
   @ApiProperty({
@@ -64,8 +65,8 @@ export class EventDto {
   maxPeople!: number;
 
   @ApiProperty({
-    description: '최대 정원',
-    type: boolean,
+    description: '아카이브 상태인지 여부',
+    type: Boolean,
   })
   isArchived!: boolean;
 
