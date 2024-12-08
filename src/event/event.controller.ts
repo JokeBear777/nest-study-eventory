@@ -50,12 +50,15 @@ export class EventController {
 
   @Get(':eventId')
   @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: '특정 id의 모임 데이터를 가져옵니다.' })
   @ApiOkResponse({ type: EventDto })
   async getEventById(
     @Param('eventId', ParseIntPipe) eventId: number,
+    @CurrentUser() user: UserBaseInfo,
   ): Promise<EventDto> {
-    return this.eventService.getEventById(eventId);
+    return this.eventService.getEventById(eventId, user);
   }
 
   @Get()

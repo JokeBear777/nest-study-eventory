@@ -95,14 +95,29 @@ export class ReviewRepository {
     });
   }
 
-  async getReviews(query: ReviewQuery): Promise<ReviewData[]> {
+  async getReviews(query: ReviewQuery, userId: number): Promise<ReviewData[]> {
     return this.prisma.review.findMany({
       where: {
-        eventId: query.eventId,
-        user: {
-          deletedAt: null,
-          id: query.userId,
-        },
+        ...(query.eventId && 
+          { eventId: query.eventId,
+            event: {
+              OR: [
+                { isArchived: false }, 
+                {
+                  isArchived: true, 
+                  eventJoin: {
+                    some: { userId: userId }, 
+                  },
+                },
+              ],
+            },
+          }), 
+        ...(query.userId && {
+          user: {
+            deletedAt: null,
+            id: query.userId, 
+          },
+        }),
       },
       select: {
         id: true,

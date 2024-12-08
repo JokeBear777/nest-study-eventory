@@ -37,7 +37,7 @@ export class EventService {
 
     if (payload.clubId != null) {
       const club = await this.eventRepository.getClubById(payload.clubId);
-      if (!category) {
+      if (!club) {
         throw new NotFoundException('클럽이 존재하지 않습니다.');
       }
 
@@ -76,11 +76,16 @@ export class EventService {
     return EventDto.from(event);
   }
 
-  async getEventById(eventId: number): Promise<EventDto> {
+  async getEventById(eventId: number, user: UserBaseInfo): Promise<EventDto> {
     const event = await this.eventRepository.getEventById(eventId);
 
     if (!event) {
       throw new NotFoundException('event가 존재하지 않습니다.');
+    }
+
+    if (event.isArchived === true) {
+      const isUserJoinedEvent = await this.eventRepository.isUserJoinedEvent(eventId, user.id);
+      throw new ForbiddenException('삭제된 클럽의 클럽모임은 참여자만 조회할 수 있습니다 ');
     }
 
     return EventDto.from(event);
@@ -103,6 +108,18 @@ export class EventService {
     );
     if (isEventJoin) {
       throw new ConflictException('이미 참가한 모임입니다.');
+    }
+
+    if (event.clubId != null) {
+      const club = await this.eventRepository.getClubById(event.clubId);
+      if (!club) {
+        throw new NotFoundException('클럽이 존재하지 않습니다.');
+      }
+
+      const isClubMember = await this.eventRepository.isClubMember(event.clubId, user.id);
+      if (!isClubMember) {
+        throw new ForbiddenException('해당 클럽멤버만 클럽 모임에 참가할 수 있습니다');
+      }
     }
 
     if (event.startTime < new Date()) {
@@ -236,7 +253,7 @@ export class EventService {
   }
 
   async getMyEvents(user: UserBaseInfo): Promise<EventListDto> {
-    const events = await this.eventRepository.getEventsJoinedBy(user.id);
+    const events = await this.eventRepository.getEventsJoined(user.id);
 
     return EventListDto.from(events);
   }

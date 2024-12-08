@@ -275,7 +275,7 @@ export class EventRepository {
     });
   }
 
-  async getEventsJoinedBy(userId: number): Promise<EventData[]> {
+  async getEventsJoined(userId: number): Promise<EventData[]> {
     return this.prisma.event.findMany({
       where: {
         eventJoin: {

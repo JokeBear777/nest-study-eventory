@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -69,18 +70,26 @@ export class ReviewService {
     return ReviewDto.from(review);
   }
 
-  async getReviewById(reviewId: number): Promise<ReviewDto> {
+  async getReviewById(reviewId: number, user: UserBaseInfo): Promise<ReviewDto> {
     const review = await this.reviewRepository.getReviewById(reviewId);
 
     if (!review) {
       throw new NotFoundException('Review가 존재하지 않습니다.');
     }
 
+    const event = await this.reviewRepository.getEventById(review.eventId);
+    if (event?.clubId != null && event.isArchived === true) {
+      const isEventJoin = await this.reviewRepository.isUserJoinedEvent(user.id, event.id);
+      if (!isEventJoin) {
+        throw new ForbiddenException('삭제된 클럽의 클럽모임 리뷰는 참여자만 조회할 수 있습니다.');
+      }
+    }
+
     return ReviewDto.from(review);
   }
 
-  async getReviews(query: ReviewQuery): Promise<ReviewListDto> {
-    const reviews = await this.reviewRepository.getReviews(query);
+  async getReviews(query: ReviewQuery, user: UserBaseInfo): Promise<ReviewListDto> {
+    const reviews = await this.reviewRepository.getReviews(query, user.id);
 
     return ReviewListDto.from(reviews);
   }
