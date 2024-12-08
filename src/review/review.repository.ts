@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/services/prisma.service';
 import { CreateReviewData } from './type/create-review-data.type';
 import { ReviewData } from './type/review-data.type';
-import { User, Event } from '@prisma/client';
+import { User, Event, Status } from '@prisma/client';
 import { ReviewQuery } from './query/review.query';
 import { UpdateReviewData } from './type/update-review-data.type';
 import { EventData } from './type/event-data';
@@ -155,6 +155,7 @@ export class ReviewRepository {
           clubId: clubId,
           userId: userId,
         },
+        status : Status.APPROVED,
       },
     });
 
@@ -206,6 +207,7 @@ export class ReviewRepository {
     const joinedClubs = await this.prisma.clubMember.findMany({
       where: {
         userId: userId,
+        status : Status.APPROVED,
       },
       select: {
         clubId: true,

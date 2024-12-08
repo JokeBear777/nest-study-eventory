@@ -88,7 +88,7 @@ export class EventService {
       throw new NotFoundException('event가 존재하지 않습니다.');
     }
 
-    if (event.clubId != null) {
+    if (event.clubId !== null) {
       const isUserClubMember = await this.eventRepository.isClubMember(
         event.clubId,
         user.id,

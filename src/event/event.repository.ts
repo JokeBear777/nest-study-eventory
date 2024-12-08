@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/services/prisma.service';
 import { CreateEventData } from './type/create-event-data.type';
 import { EventData } from './type/event-data';
-import { Category, City, User, type Club } from '@prisma/client';
+import { Category, City, Status, User, type Club } from '@prisma/client';
 import { EventQuery } from './query/event.query';
 import { UpdateEventData } from './type/update-event-data';
 
@@ -302,6 +302,7 @@ export class EventRepository {
           clubId: clubId,
           userId: userId,
         },
+        status : Status.APPROVED,
       },
     });
 
@@ -329,6 +330,7 @@ export class EventRepository {
     const joinedClubs = await this.prisma.clubMember.findMany({
       where: {
         userId: userId,
+        status : Status.APPROVED,
       },
       select: {
         clubId: true,

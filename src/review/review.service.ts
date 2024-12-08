@@ -82,7 +82,7 @@ export class ReviewService {
     }
 
     const event = await this.reviewRepository.getEventById(review.eventId);
-    if (event?.clubId != null && event.isArchived === true) {
+    if (event?.clubId !== null && event?.isArchived === true) {
       const isEventJoin = await this.reviewRepository.isUserJoinedEvent(
         user.id,
         event.id,
@@ -94,11 +94,17 @@ export class ReviewService {
       }
     }
 
-    if (event?.clubId != null) {
+    if (event?.clubId !== null) {
+      if (event?.clubId === undefined) {
+        throw new InternalServerErrorException(
+          '서버 오류.',
+        );
+      }
       const isUserClubMember = await this.reviewRepository.isClubMember(
         event.clubId,
         user.id,
       );
+
       if (!isUserClubMember) {
         throw new ForbiddenException(
           '클럽 모임 리뷰는 클럽원만 조회할 수 있습니다 ',
