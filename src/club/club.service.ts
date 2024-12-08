@@ -105,7 +105,7 @@ export class ClubService {
     if (memberStatus == Status.PENDING) {
       throw new ForbiddenException('클럽 가입 신청이 이미 진행 중입니다');
     }
-    if (memberStatus == Status.APPROVED || Status.LEADER) {
+    if (memberStatus == Status.APPROVED) {
       throw new ForbiddenException('이미 가입한 클럽입니다');
     }
 
@@ -247,12 +247,12 @@ export class ClubService {
       clubId,
       payload.userId,
     );
-    if (nextHostStatus === null || nextHostStatus === Status.APPROVED) {
+    if (nextHostStatus === null || nextHostStatus === Status.PENDING) {
       throw new ConflictException(
         '클럽에 가입하지 않는 유저는 클럽장이 될 수 없습니다',
       );
     }
-    if (nextHostStatus === Status.LEADER) {
+    if (user.id === payload.userId) {
       throw new ConflictException(
         '이미 해당 클럽의 클럽장 입니다',
       );

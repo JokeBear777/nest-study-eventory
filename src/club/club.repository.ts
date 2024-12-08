@@ -20,7 +20,7 @@ export class ClubRepository {
         clubMember: {
           create: {
             userId: data.hostId,
-            status: Status.LEADER,
+            status: Status.APPROVED,
           },
         },
       },
@@ -265,26 +265,6 @@ export class ClubRepository {
        where: { id: clubId },
        data: {
          hostId: nextHostId,
-        },
-      });
-
-      await prisma.clubMember.updateMany({
-        where: {
-          clubId: clubId,
-          userId: hostId,
-        },
-        data: {
-          status: Status.APPROVED,
-        },
-      });
-
-      await prisma.clubMember.updateMany({
-        where: {
-          clubId: clubId,
-          userId: nextHostId,
-        },
-        data: {
-          status: Status.LEADER,
         },
       });
 
