@@ -20,7 +20,7 @@ export class ClubRepository {
         clubMember: {
           create: {
             userId: data.hostId,
-            status: Status.LEADER,
+            status: Status.APPROVED,
           },
         },
       },
@@ -254,5 +254,15 @@ export class ClubRepository {
         status: true,
       },
     });
+  }
+  async updateClubHost(clubId: number, nextHostId: number): Promise<any> {
+    const updatedClub = await this.prisma.club.update({
+      where: { id: clubId },
+      data: {
+        hostId: nextHostId,
+      },
+    });
+
+    return updatedClub;
   }
 }

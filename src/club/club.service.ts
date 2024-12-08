@@ -15,6 +15,7 @@ import { Status } from '@prisma/client';
 import { ApproveApplicantsPayload } from './payload/approve-applicants.payload';
 import { RejectApplicantsPayload } from './payload/reject-applicants-payload';
 import { ClubMemberListDto } from './dto/club-member.dto';
+import { UpdateClubHostPayload } from './payload/update-club-host-payload';
 
 @Injectable()
 export class ClubService {
@@ -104,7 +105,7 @@ export class ClubService {
     if (memberStatus == Status.PENDING) {
       throw new ForbiddenException('클럽 가입 신청이 이미 진행 중입니다');
     }
-    if (memberStatus == Status.APPROVED || Status.LEADER) {
+    if (memberStatus == Status.APPROVED) {
       throw new ForbiddenException('이미 가입한 클럽입니다');
     }
 
@@ -223,5 +224,43 @@ export class ClubService {
     const clubApplicants = await this.clubRepository.getClubApplicants(clubId);
 
     return ClubMemberListDto.from(clubApplicants);
+  }
+
+  async updateClubHost(
+    clubId: number,
+    user: UserBaseInfo,
+    payload: UpdateClubHostPayload,
+  ): Promise<ClubDto> {
+    const club = await this.clubRepository.getClubById(clubId);
+    if (!club) {
+      throw new NotFoundException('클럽이 존재하지 않습니다.');
+    }
+
+    const currentHostId = club.hostId;
+    if (currentHostId != user.id) {
+      throw new ForbiddenException(
+        '클럽장만 클럽의 클럽장을 양도할 수 있습니다',
+      );
+    }
+
+    const nextHostStatus = await this.clubRepository.getClubMemberStatus(
+      clubId,
+      payload.userId,
+    );
+    if (nextHostStatus === null || nextHostStatus === Status.PENDING) {
+      throw new ConflictException(
+        '클럽에 가입하지 않는 유저는 클럽장이 될 수 없습니다',
+      );
+    }
+    if (user.id === payload.userId) {
+      throw new ConflictException('이미 해당 클럽의 클럽장 입니다');
+    }
+
+    const updatedClub = await this.clubRepository.updateClubHost(
+      clubId,
+      user.id,
+    );
+
+    return ClubDto.from(updatedClub);
   }
 }
