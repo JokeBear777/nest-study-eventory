@@ -255,21 +255,15 @@ export class ClubRepository {
       },
     });
   }
-  async updateClubHost(
-    clubId: number,
-    nextHostId: number,
-  ): Promise<any> {
-    await this.prisma.$transaction(async (prisma) => {
-      const updatedClub = await prisma.club.update({
-       where: { id: clubId },
-       data: {
-         hostId: nextHostId,
-        },
-      });
-
-      return updatedClub;
-
+  async updateClubHost(clubId: number, nextHostId: number): Promise<any> {
+    const updatedClub = await this.prisma.club.update({
+      where: { id: clubId },
+      data: {
+        hostId: nextHostId,
+      },
     });
+  
+    return updatedClub;
   }
 
 }
