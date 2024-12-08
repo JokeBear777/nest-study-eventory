@@ -109,20 +109,17 @@ export class EventService {
  
     const events = await this.eventRepository.getEvents(query, user.id);
 
-    const filteredEvents: EventData[] = [];
+    const eventIds = events.map((event) => event.id);
 
-    for (const event of events) {
+    const joinedEventIds = await this.eventRepository.getUserJoinedEvents(eventIds, user.id);
+
+    const filteredEvents = events.filter((event) => {
       if (!event.isArchived) {
-       filteredEvents.push(event);
-      } 
-      if (event.isArchived) {
-        const isJoined = await this.eventRepository.isUserJoinedEvent(event.id, user.id);
-        if (isJoined) {
-          filteredEvents.push(event);
-        }
-      } 
-    }
-
+        return true; 
+      }
+      return joinedEventIds.has(event.id); 
+    });
+  
     return EventListDto.from(filteredEvents);
   }
 
@@ -140,7 +137,7 @@ export class EventService {
       throw new ConflictException('이미 참가한 모임입니다.');
     }
 
-    if (event.clubId != null) {
+    if (event.clubId !== null) {
       const club = await this.eventRepository.getClubById(event.clubId);
       if (!club) {
         throw new NotFoundException('클럽이 존재하지 않습니다.');

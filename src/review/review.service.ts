@@ -85,13 +85,46 @@ export class ReviewService {
       }
     }
 
+    if (event?.clubId != null) {
+      const isUserClubMember = await this.reviewRepository.isClubMember(event.clubId, user.id);
+      if (!isUserClubMember) {
+        throw new ForbiddenException('클럽 모임 리뷰는 클럽원만 조회할 수 있습니다 ');
+      }
+    }
+
     return ReviewDto.from(review);
   }
 
   async getReviews(query: ReviewQuery, user: UserBaseInfo): Promise<ReviewListDto> {
+    
+    if (query.eventId != null) {
+      const event = await this.reviewRepository.getEventById(query.eventId);
+
+      if (event?.clubId) {
+        const isUserClubMember = await this.reviewRepository.isClubMember(event.clubId, user.id);
+        if (!isUserClubMember) {
+          throw new ForbiddenException('클럽모임 리뷰는 클럽원만 조회할 수 있습니다 ');
+        }
+      }
+    }
+    
     const reviews = await this.reviewRepository.getReviews(query, user.id);
 
-    return ReviewListDto.from(reviews);
+    const eventIds = reviews.map((review) => review.eventId);
+
+    const events = await this.reviewRepository.getEventsByIds(eventIds);
+
+    const joinedEventIds = await this.reviewRepository.getUserJoinedEvents(eventIds, user.id);
+
+    const filteredReviews = reviews.filter((review) => {
+      const event = events.find((e) => e.id === review.eventId);
+  
+      if (!event) return false; 
+      if (!event.isArchived) return true; 
+      return joinedEventIds.has(event.id); 
+    })
+
+    return ReviewListDto.from(filteredReviews);
   }
 
   async putUpdateReview(

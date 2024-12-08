@@ -308,4 +308,18 @@ export class EventRepository {
   
     return clubMember !== null; 
   }
+
+  async getUserJoinedEvents(eventIds: number[], userId: number): Promise<Set<number>> {
+    const joinedEvents = await this.prisma.eventJoin.findMany({
+      where: {
+        eventId: { in: eventIds }, 
+        userId: userId,           
+      },
+      select: {
+        eventId: true,            
+      },
+    });
+  
+    return new Set(joinedEvents.map((event) => event.eventId)); 
+  }
 }

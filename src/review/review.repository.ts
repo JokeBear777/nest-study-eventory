@@ -5,6 +5,8 @@ import { ReviewData } from './type/review-data.type';
 import { User, Event } from '@prisma/client';
 import { ReviewQuery } from './query/review.query';
 import { UpdateReviewData } from './type/update-review-data.type';
+import { EventData } from './type/event-data';
+
 
 @Injectable()
 export class ReviewRepository {
@@ -99,17 +101,6 @@ export class ReviewRepository {
     return this.prisma.review.findMany({
       where: {
         eventId: query.eventId,
-        event: {
-          OR: [
-                { isArchived: false }, 
-                {
-                  isArchived: true, 
-                  eventJoin: {
-                  some: { userId: userId }, 
-                  },
-                },
-          ],
-        }, 
         user: {
           deletedAt: null,
           id: query.userId, 
@@ -156,5 +147,56 @@ export class ReviewRepository {
         id: reviewId,
       },
     });
+  }
+
+  async isClubMember(clubId: number, userId: number): Promise<boolean> {
+    const clubMember = await this.prisma.clubMember.findUnique({
+      where: {
+        clubId_userId: {
+          clubId: clubId,
+          userId: userId,
+        },
+      },
+    });
+  
+    return clubMember !== null; 
+  }
+
+  async getEventsByIds(eventIds: number[]): Promise<EventData[]> {
+    return this.prisma.event.findMany({
+      where: { id: { in: eventIds } },
+      select: {
+        id: true,
+        hostId: true,
+        title: true,
+        description: true,
+        categoryId: true,
+        clubId: true,
+        startTime: true,
+        endTime: true,
+        maxPeople: true,
+        isArchived: true,
+        eventCity: {
+          select: {
+            id: true,
+            cityId: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getUserJoinedEvents(eventIds: number[], userId: number): Promise<Set<number>> {
+    const joinedEvents = await this.prisma.eventJoin.findMany({
+      where: {
+        eventId: { in: eventIds },
+        userId: userId,
+      },
+      select: {
+        eventId: true,
+      },
+    });
+  
+    return new Set(joinedEvents.map((event) => event.eventId));
   }
 }
