@@ -275,7 +275,7 @@ export class ClubRepository {
         },
       },
     });
-  
-    return clubMember !== null; 
+
+    return clubMember !== null;
   }
 }

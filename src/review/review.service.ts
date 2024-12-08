@@ -71,7 +71,10 @@ export class ReviewService {
     return ReviewDto.from(review);
   }
 
-  async getReviewById(reviewId: number, user: UserBaseInfo): Promise<ReviewDto> {
+  async getReviewById(
+    reviewId: number,
+    user: UserBaseInfo,
+  ): Promise<ReviewDto> {
     const review = await this.reviewRepository.getReviewById(reviewId);
 
     if (!review) {
@@ -80,50 +83,69 @@ export class ReviewService {
 
     const event = await this.reviewRepository.getEventById(review.eventId);
     if (event?.clubId != null && event.isArchived === true) {
-      const isEventJoin = await this.reviewRepository.isUserJoinedEvent(user.id, event.id);
+      const isEventJoin = await this.reviewRepository.isUserJoinedEvent(
+        user.id,
+        event.id,
+      );
       if (!isEventJoin) {
-        throw new ForbiddenException('삭제된 클럽의 클럽모임 리뷰는 참여자만 조회할 수 있습니다.');
+        throw new ForbiddenException(
+          '삭제된 클럽의 클럽모임 리뷰는 참여자만 조회할 수 있습니다.',
+        );
       }
     }
 
     if (event?.clubId != null) {
-      const isUserClubMember = await this.reviewRepository.isClubMember(event.clubId, user.id);
+      const isUserClubMember = await this.reviewRepository.isClubMember(
+        event.clubId,
+        user.id,
+      );
       if (!isUserClubMember) {
-        throw new ForbiddenException('클럽 모임 리뷰는 클럽원만 조회할 수 있습니다 ');
+        throw new ForbiddenException(
+          '클럽 모임 리뷰는 클럽원만 조회할 수 있습니다 ',
+        );
       }
     }
 
     return ReviewDto.from(review);
   }
 
-  async getReviews(query: ReviewQuery, user: UserBaseInfo): Promise<ReviewListDto> {
-     
+  async getReviews(
+    query: ReviewQuery,
+    user: UserBaseInfo,
+  ): Promise<ReviewListDto> {
     const reviews = await this.reviewRepository.getReviews(query, user.id);
 
-    const eventIds = Array.from(new Set(reviews.map((review) => review.eventId)));
+    const eventIds = Array.from(
+      new Set(reviews.map((review) => review.eventId)),
+    );
 
     const events = await this.reviewRepository.getEventsByIds(eventIds);
 
-    const joinedEventIds = await this.reviewRepository.getUserJoinedEventIds(eventIds, user.id);
+    const joinedEventIds = await this.reviewRepository.getUserJoinedEventIds(
+      eventIds,
+      user.id,
+    );
 
-    const joinedClubIds = await this.reviewRepository.getUserJoinedClubIds(user.id);
+    const joinedClubIds = await this.reviewRepository.getUserJoinedClubIds(
+      user.id,
+    );
 
     const filteredReviews = reviews.filter((review) => {
       const event = events.find((e) => e.id === review.eventId);
-  
+
       if (!event) {
-        throw new InternalServerErrorException("서버 오류");
-      } 
+        throw new InternalServerErrorException('서버 오류');
+      }
       if (!event.isArchived) {
         if (!event.clubId) {
-          return true; 
+          return true;
         }
         if (event.clubId) {
-          return joinedClubIds.includes(event.clubId); 
+          return joinedClubIds.includes(event.clubId);
         }
-      }; 
-      return joinedEventIds.includes(event.id); 
-    })
+      }
+      return joinedEventIds.includes(event.id);
+    });
 
     return ReviewListDto.from(filteredReviews);
   }

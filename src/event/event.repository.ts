@@ -6,7 +6,6 @@ import { Category, City, User, type Club } from '@prisma/client';
 import { EventQuery } from './query/event.query';
 import { UpdateEventData } from './type/update-event-data';
 
-
 @Injectable()
 export class EventRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -121,7 +120,7 @@ export class EventRepository {
         },
         eventCity: {
           some: {
-              cityId: query.cityId,
+            cityId: query.cityId,
           },
         },
         categoryId: query.categoryId,
@@ -305,34 +304,37 @@ export class EventRepository {
         },
       },
     });
-  
-    return clubMember !== null; 
+
+    return clubMember !== null;
   }
 
-  async getUserJoinedEventIds(eventIds: number[], userId: number): Promise<number[]> {
+  async getUserJoinedEventIds(
+    eventIds: number[],
+    userId: number,
+  ): Promise<number[]> {
     const joinedEvents = await this.prisma.eventJoin.findMany({
       where: {
-        eventId: { in: eventIds }, 
-        userId: userId,           
+        eventId: { in: eventIds },
+        userId: userId,
       },
       select: {
-        eventId: true,            
+        eventId: true,
       },
     });
-  
-    return joinedEvents.map((event) => event.eventId); 
+
+    return joinedEvents.map((event) => event.eventId);
   }
 
-  async getUserJoinedClubIds(userId : number) : Promise<number[]> {
+  async getUserJoinedClubIds(userId: number): Promise<number[]> {
     const joinedClubs = await this.prisma.clubMember.findMany({
       where: {
-        userId: userId, 
+        userId: userId,
       },
       select: {
-        clubId: true, 
+        clubId: true,
       },
     });
-  
+
     return joinedClubs.map((clubMember) => clubMember.clubId);
   }
 }

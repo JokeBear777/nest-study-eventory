@@ -41,9 +41,14 @@ export class EventService {
         throw new NotFoundException('클럽이 존재하지 않습니다.');
       }
 
-      const isClubMember = await this.eventRepository.isClubMember(payload.clubId, user.id);
+      const isClubMember = await this.eventRepository.isClubMember(
+        payload.clubId,
+        user.id,
+      );
       if (!isClubMember) {
-        throw new ForbiddenException('해당 클럽멤버만 클럽 모임을 생성할 수 있습니다');
+        throw new ForbiddenException(
+          '해당 클럽멤버만 클럽 모임을 생성할 수 있습니다',
+        );
       }
     }
 
@@ -84,42 +89,57 @@ export class EventService {
     }
 
     if (event.clubId != null) {
-      const isUserClubMember = await this.eventRepository.isClubMember(event.clubId, user.id);
+      const isUserClubMember = await this.eventRepository.isClubMember(
+        event.clubId,
+        user.id,
+      );
       if (!isUserClubMember) {
         throw new ForbiddenException('클럽모임은 클럽원만 조회할 수 있습니다 ');
       }
     }
 
     if (event.isArchived === true) {
-      const isUserJoinedEvent = await this.eventRepository.isUserJoinedEvent(eventId, user.id);
-      throw new ForbiddenException('삭제된 클럽의 클럽모임은 참여자만 조회할 수 있습니다 ');
+      const isUserJoinedEvent = await this.eventRepository.isUserJoinedEvent(
+        eventId,
+        user.id,
+      );
+      throw new ForbiddenException(
+        '삭제된 클럽의 클럽모임은 참여자만 조회할 수 있습니다 ',
+      );
     }
 
     return EventDto.from(event);
   }
 
-  async getEvents(query: EventQuery, user: UserBaseInfo): Promise<EventListDto> {
-    
+  async getEvents(
+    query: EventQuery,
+    user: UserBaseInfo,
+  ): Promise<EventListDto> {
     const events = await this.eventRepository.getEvents(query, user.id);
 
     const eventIds = events.map((event) => event.id);
 
-    const joinedEventIds = await this.eventRepository.getUserJoinedEventIds(eventIds, user.id);
+    const joinedEventIds = await this.eventRepository.getUserJoinedEventIds(
+      eventIds,
+      user.id,
+    );
 
-    const joinedClubIds = await this.eventRepository.getUserJoinedClubIds(user.id);
+    const joinedClubIds = await this.eventRepository.getUserJoinedClubIds(
+      user.id,
+    );
 
     const filteredEvents = events.filter((event) => {
       if (!event.isArchived) {
         if (!event.clubId) {
-          return true; 
+          return true;
         }
         if (event.clubId) {
-          return joinedClubIds.includes(event.clubId); 
+          return joinedClubIds.includes(event.clubId);
         }
       }
-      return joinedEventIds.includes(event.id); 
+      return joinedEventIds.includes(event.id);
     });
-  
+
     return EventListDto.from(filteredEvents);
   }
 
@@ -143,9 +163,14 @@ export class EventService {
         throw new NotFoundException('클럽이 존재하지 않습니다.');
       }
 
-      const isClubMember = await this.eventRepository.isClubMember(event.clubId, user.id);
+      const isClubMember = await this.eventRepository.isClubMember(
+        event.clubId,
+        user.id,
+      );
       if (!isClubMember) {
-        throw new ForbiddenException('해당 클럽멤버만 클럽 모임에 참가할 수 있습니다');
+        throw new ForbiddenException(
+          '해당 클럽멤버만 클럽 모임에 참가할 수 있습니다',
+        );
       }
     }
 

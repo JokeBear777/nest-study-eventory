@@ -1,8 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { EventData } from '../type/event-data';
 
-
-
 export class EventDto {
   @ApiProperty({
     description: '모임 ID',
@@ -35,10 +33,10 @@ export class EventDto {
   categoryId!: number;
 
   @ApiProperty({
-    description : '클럽 Id',
+    description: '클럽 Id',
     type: Number,
   })
-  clubId!: number|null;
+  clubId!: number | null;
 
   @ApiProperty({
     description: '지역 목록',

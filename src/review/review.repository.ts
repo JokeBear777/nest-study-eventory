@@ -7,7 +7,6 @@ import { ReviewQuery } from './query/review.query';
 import { UpdateReviewData } from './type/update-review-data.type';
 import { EventData } from './type/event-data';
 
-
 @Injectable()
 export class ReviewRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -103,7 +102,7 @@ export class ReviewRepository {
         eventId: query.eventId,
         user: {
           deletedAt: null,
-          id: query.userId, 
+          id: query.userId,
         },
       },
       select: {
@@ -158,8 +157,8 @@ export class ReviewRepository {
         },
       },
     });
-  
-    return clubMember !== null; 
+
+    return clubMember !== null;
   }
 
   async getEventsByIds(eventIds: number[]): Promise<EventData[]> {
@@ -186,7 +185,10 @@ export class ReviewRepository {
     });
   }
 
-  async getUserJoinedEventIds(eventIds: number[], userId: number): Promise<number[]> {
+  async getUserJoinedEventIds(
+    eventIds: number[],
+    userId: number,
+  ): Promise<number[]> {
     const joinedEvents = await this.prisma.eventJoin.findMany({
       where: {
         eventId: { in: eventIds },
@@ -196,20 +198,20 @@ export class ReviewRepository {
         eventId: true,
       },
     });
-  
+
     return joinedEvents.map((event) => event.eventId);
   }
 
-  async getUserJoinedClubIds(userId : number) : Promise<number[]> {
+  async getUserJoinedClubIds(userId: number): Promise<number[]> {
     const joinedClubs = await this.prisma.clubMember.findMany({
       where: {
-        userId: userId, 
+        userId: userId,
       },
       select: {
-        clubId: true, 
+        clubId: true,
       },
     });
-  
+
     return joinedClubs.map((clubMember) => clubMember.clubId);
   }
 }
