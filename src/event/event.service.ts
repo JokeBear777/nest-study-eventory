@@ -100,24 +100,24 @@ export class EventService {
 
   async getEvents(query: EventQuery, user: UserBaseInfo): Promise<EventListDto> {
     
-    if (query.clubId) {
-      const isUserClubMember = await this.eventRepository.isClubMember(query.clubId, user.id);
-      if (!isUserClubMember) {
-        throw new ForbiddenException('클럽모임은 클럽원만 조회할 수 있습니다 ');
-      }
-    }
- 
     const events = await this.eventRepository.getEvents(query, user.id);
 
     const eventIds = events.map((event) => event.id);
 
-    const joinedEventIds = await this.eventRepository.getUserJoinedEvents(eventIds, user.id);
+    const joinedEventIds = await this.eventRepository.getUserJoinedEventIds(eventIds, user.id);
+
+    const joinedClubIds = await this.eventRepository.getUserJoinedClubIds(user.id);
 
     const filteredEvents = events.filter((event) => {
       if (!event.isArchived) {
-        return true; 
+        if (!event.clubId) {
+          return true; 
+        }
+        if (event.clubId) {
+          return joinedClubIds.includes(event.clubId); 
+        }
       }
-      return joinedEventIds.has(event.id); 
+      return joinedEventIds.includes(event.id); 
     });
   
     return EventListDto.from(filteredEvents);

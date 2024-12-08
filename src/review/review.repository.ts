@@ -186,7 +186,7 @@ export class ReviewRepository {
     });
   }
 
-  async getUserJoinedEvents(eventIds: number[], userId: number): Promise<Set<number>> {
+  async getUserJoinedEventIds(eventIds: number[], userId: number): Promise<number[]> {
     const joinedEvents = await this.prisma.eventJoin.findMany({
       where: {
         eventId: { in: eventIds },
@@ -197,6 +197,19 @@ export class ReviewRepository {
       },
     });
   
-    return new Set(joinedEvents.map((event) => event.eventId));
+    return joinedEvents.map((event) => event.eventId);
+  }
+
+  async getUserJoinedClubIds(userId : number) : Promise<number[]> {
+    const joinedClubs = await this.prisma.clubMember.findMany({
+      where: {
+        userId: userId, 
+      },
+      select: {
+        clubId: true, 
+      },
+    });
+  
+    return joinedClubs.map((clubMember) => clubMember.clubId);
   }
 }
