@@ -155,7 +155,7 @@ export class ReviewRepository {
           clubId: clubId,
           userId: userId,
         },
-        status : Status.APPROVED,
+        status: Status.APPROVED,
       },
     });
 
@@ -207,7 +207,7 @@ export class ReviewRepository {
     const joinedClubs = await this.prisma.clubMember.findMany({
       where: {
         userId: userId,
-        status : Status.APPROVED,
+        status: Status.APPROVED,
       },
       select: {
         clubId: true,

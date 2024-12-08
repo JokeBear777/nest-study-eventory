@@ -96,9 +96,7 @@ export class ReviewService {
 
     if (event?.clubId !== null) {
       if (event?.clubId === undefined) {
-        throw new InternalServerErrorException(
-          '서버 오류.',
-        );
+        throw new InternalServerErrorException('서버 오류.');
       }
       const isUserClubMember = await this.reviewRepository.isClubMember(
         event.clubId,

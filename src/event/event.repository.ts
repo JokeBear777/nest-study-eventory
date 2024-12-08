@@ -302,7 +302,7 @@ export class EventRepository {
           clubId: clubId,
           userId: userId,
         },
-        status : Status.APPROVED,
+        status: Status.APPROVED,
       },
     });
 
@@ -330,7 +330,7 @@ export class EventRepository {
     const joinedClubs = await this.prisma.clubMember.findMany({
       where: {
         userId: userId,
-        status : Status.APPROVED,
+        status: Status.APPROVED,
       },
       select: {
         clubId: true,
