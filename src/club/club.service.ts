@@ -253,19 +253,14 @@ export class ClubService {
       );
     }
     if (user.id === payload.userId) {
-      throw new ConflictException(
-        '이미 해당 클럽의 클럽장 입니다',
-      );
+      throw new ConflictException('이미 해당 클럽의 클럽장 입니다');
     }
-
 
     const updatedClub = await this.clubRepository.updateClubHost(
       clubId,
       user.id,
-      payload.userId,
     );
 
     return ClubDto.from(updatedClub);
   }
 }
-
