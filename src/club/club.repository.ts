@@ -273,4 +273,15 @@ export class ClubRepository {
     });
   }
 
+  async isClubMember(
+    clubId: number,
+    userId: number,
+  ) : Promise<Boolean> {
+    await this.prisma.clubMember.findUnique({
+      where: {
+        clubId
+      },
+    });
+  }
+
 }

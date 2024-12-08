@@ -40,7 +40,12 @@ export class EventService {
       if (!category) {
         throw new NotFoundException('클럽이 존재하지 않습니다.');
       }
-   }
+
+      const isClubMember = await this.eventRepository.isClubMember(payload.clubId, user.id);
+      if (!isClubMember) {
+        throw new ForbiddenException('해당 클럽멤버만 클럽 모임을 생성할 수 있습니다');
+      }
+    }
 
     const now = new Date();
 
