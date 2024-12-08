@@ -258,11 +258,9 @@ export class ClubService {
       );
     }
 
-
     const updatedClub = await this.clubRepository.updateClubHost(
       clubId,
       user.id,
-      payload.userId,
     );
 
     return ClubDto.from(updatedClub);

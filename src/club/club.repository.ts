@@ -257,7 +257,6 @@ export class ClubRepository {
   }
   async updateClubHost(
     clubId: number,
-    hostId: number,
     nextHostId: number,
   ): Promise<any> {
     await this.prisma.$transaction(async (prisma) => {
