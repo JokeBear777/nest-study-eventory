@@ -265,4 +265,17 @@ export class ClubRepository {
 
     return updatedClub;
   }
+
+  async isClubMember(clubId: number, userId: number): Promise<boolean> {
+    const clubMember = await this.prisma.clubMember.findUnique({
+      where: {
+        clubId_userId: {
+          clubId: clubId,
+          userId: userId,
+        },
+      },
+    });
+
+    return clubMember !== null;
+  }
 }

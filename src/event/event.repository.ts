@@ -2,11 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/services/prisma.service';
 import { CreateEventData } from './type/create-event-data.type';
 import { EventData } from './type/event-data';
-import { Category, City, User } from '@prisma/client';
+import { Category, City, Status, User, type Club } from '@prisma/client';
 import { EventQuery } from './query/event.query';
-import { UpdateEventJoinPayload } from './payload/update-event-join-payload';
 import { UpdateEventData } from './type/update-event-data';
-import { UserBaseInfo } from 'src/auth/type/user-base-info.type';
 
 @Injectable()
 export class EventRepository {
@@ -39,9 +37,11 @@ export class EventRepository {
         title: true,
         description: true,
         categoryId: true,
+        clubId: true,
         startTime: true,
         endTime: true,
         maxPeople: true,
+        isArchived: true,
         eventCity: {
           select: {
             id: true,
@@ -96,9 +96,11 @@ export class EventRepository {
         title: true,
         description: true,
         categoryId: true,
+        clubId: true,
         startTime: true,
         endTime: true,
         maxPeople: true,
+        isArchived: true,
         eventCity: {
           select: {
             id: true,
@@ -109,18 +111,20 @@ export class EventRepository {
     });
   }
 
-  async getEvents(query: EventQuery): Promise<EventData[]> {
+  async getEvents(query: EventQuery, userId: number): Promise<EventData[]> {
     return this.prisma.event.findMany({
       where: {
-        hostId: query.hostId,
-        ...(query.cityId && {
-          eventCity: {
-            some: {
-              cityId: query.cityId,
-            },
+        host: {
+          id: query.hostId,
+          deletedAt: null,
+        },
+        eventCity: {
+          some: {
+            cityId: query.cityId,
           },
-        }),
+        },
         categoryId: query.categoryId,
+        clubId: query.clubId,
       },
       select: {
         id: true,
@@ -128,9 +132,11 @@ export class EventRepository {
         title: true,
         description: true,
         categoryId: true,
+        clubId: true,
         startTime: true,
         endTime: true,
         maxPeople: true,
+        isArchived: true,
         eventCity: {
           select: {
             id: true,
@@ -222,9 +228,11 @@ export class EventRepository {
         title: true,
         description: true,
         categoryId: true,
+        clubId: true,
         startTime: true,
         endTime: true,
         maxPeople: true,
+        isArchived: true,
         eventCity: {
           select: {
             id: true,
@@ -249,7 +257,7 @@ export class EventRepository {
     });
   }
 
-  async getEventsJoinedBy(userId: number): Promise<EventData[]> {
+  async getEventsJoined(userId: number): Promise<EventData[]> {
     return this.prisma.event.findMany({
       where: {
         eventJoin: {
@@ -264,16 +272,71 @@ export class EventRepository {
         title: true,
         description: true,
         categoryId: true,
+        clubId: true,
+        startTime: true,
+        endTime: true,
+        maxPeople: true,
+        isArchived: true,
         eventCity: {
           select: {
             id: true,
             cityId: true,
           },
         },
-        startTime: true,
-        endTime: true,
-        maxPeople: true,
       },
     });
+  }
+
+  async getClubById(clubId: number): Promise<Club | null> {
+    return this.prisma.club.findUnique({
+      where: {
+        id: clubId,
+      },
+    });
+  }
+
+  async isClubMember(clubId: number, userId: number): Promise<boolean> {
+    const clubMember = await this.prisma.clubMember.findUnique({
+      where: {
+        clubId_userId: {
+          clubId: clubId,
+          userId: userId,
+        },
+        status: Status.APPROVED,
+      },
+    });
+
+    return clubMember !== null;
+  }
+
+  async getUserJoinedEventIds(
+    eventIds: number[],
+    userId: number,
+  ): Promise<number[]> {
+    const joinedEvents = await this.prisma.eventJoin.findMany({
+      where: {
+        eventId: { in: eventIds },
+        userId: userId,
+      },
+      select: {
+        eventId: true,
+      },
+    });
+
+    return joinedEvents.map((event) => event.eventId);
+  }
+
+  async getUserJoinedClubIds(userId: number): Promise<number[]> {
+    const joinedClubs = await this.prisma.clubMember.findMany({
+      where: {
+        userId: userId,
+        status: Status.APPROVED,
+      },
+      select: {
+        clubId: true,
+      },
+    });
+
+    return joinedClubs.map((clubMember) => clubMember.clubId);
   }
 }

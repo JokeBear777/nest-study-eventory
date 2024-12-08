@@ -13,6 +13,7 @@ import { UpdateEventJoinPayload } from './payload/update-event-join-payload';
 import { PutUpdateEventPayload } from './payload/put-update-event-payload';
 import { UpdateEventData } from './type/update-event-data';
 import { UserBaseInfo } from 'src/auth/type/user-base-info.type';
+import { EventData } from './type/event-data';
 
 @Injectable()
 export class EventService {
@@ -34,6 +35,23 @@ export class EventService {
       throw new NotFoundException('일부 지역이 존재하지 않습니다.');
     }
 
+    if (payload.clubId != null) {
+      const club = await this.eventRepository.getClubById(payload.clubId);
+      if (!club) {
+        throw new NotFoundException('클럽이 존재하지 않습니다.');
+      }
+
+      const isClubMember = await this.eventRepository.isClubMember(
+        payload.clubId,
+        user.id,
+      );
+      if (!isClubMember) {
+        throw new ForbiddenException(
+          '해당 클럽멤버만 클럽 모임을 생성할 수 있습니다',
+        );
+      }
+    }
+
     const now = new Date();
 
     if (payload.startTime < now || payload.endTime < now) {
@@ -52,6 +70,7 @@ export class EventService {
       description: payload.description,
       categoryId: payload.categoryId,
       cityIds: payload.cityIds,
+      clubId: payload.clubId ?? null,
       startTime: payload.startTime,
       endTime: payload.endTime,
       maxPeople: payload.maxPeople,
@@ -62,19 +81,66 @@ export class EventService {
     return EventDto.from(event);
   }
 
-  async getEventById(eventId: number): Promise<EventDto> {
+  async getEventById(eventId: number, user: UserBaseInfo): Promise<EventDto> {
     const event = await this.eventRepository.getEventById(eventId);
 
     if (!event) {
       throw new NotFoundException('event가 존재하지 않습니다.');
     }
 
+    if (event.clubId !== null) {
+      const isUserClubMember = await this.eventRepository.isClubMember(
+        event.clubId,
+        user.id,
+      );
+      if (!isUserClubMember) {
+        throw new ForbiddenException('클럽모임은 클럽원만 조회할 수 있습니다 ');
+      }
+    }
+
+    if (event.isArchived === true) {
+      const isUserJoinedEvent = await this.eventRepository.isUserJoinedEvent(
+        eventId,
+        user.id,
+      );
+      throw new ForbiddenException(
+        '삭제된 클럽의 클럽모임은 참여자만 조회할 수 있습니다 ',
+      );
+    }
+
     return EventDto.from(event);
   }
 
-  async getEvents(query: EventQuery): Promise<EventListDto> {
-    const events = await this.eventRepository.getEvents(query);
-    return EventListDto.from(events);
+  async getEvents(
+    query: EventQuery,
+    user: UserBaseInfo,
+  ): Promise<EventListDto> {
+    const events = await this.eventRepository.getEvents(query, user.id);
+
+    const eventIds = events.map((event) => event.id);
+
+    const joinedEventIds = await this.eventRepository.getUserJoinedEventIds(
+      eventIds,
+      user.id,
+    );
+
+    const joinedClubIds = await this.eventRepository.getUserJoinedClubIds(
+      user.id,
+    );
+
+    const filteredEvents = events.filter((event) => {
+      if (!event.isArchived) {
+        if (!event.clubId) {
+          return true;
+        }
+        if (event.clubId) {
+          return joinedClubIds.includes(event.clubId);
+        }
+      }
+      return joinedEventIds.includes(event.id);
+    });
+
+    return EventListDto.from(filteredEvents);
   }
 
   async joinEvent(eventId: number, user: UserBaseInfo): Promise<void> {
@@ -89,6 +155,23 @@ export class EventService {
     );
     if (isEventJoin) {
       throw new ConflictException('이미 참가한 모임입니다.');
+    }
+
+    if (event.clubId !== null) {
+      const club = await this.eventRepository.getClubById(event.clubId);
+      if (!club) {
+        throw new NotFoundException('클럽이 존재하지 않습니다.');
+      }
+
+      const isClubMember = await this.eventRepository.isClubMember(
+        event.clubId,
+        user.id,
+      );
+      if (!isClubMember) {
+        throw new ForbiddenException(
+          '해당 클럽멤버만 클럽 모임에 참가할 수 있습니다',
+        );
+      }
     }
 
     if (event.startTime < new Date()) {
@@ -222,7 +305,7 @@ export class EventService {
   }
 
   async getMyEvents(user: UserBaseInfo): Promise<EventListDto> {
-    const events = await this.eventRepository.getEventsJoinedBy(user.id);
+    const events = await this.eventRepository.getEventsJoined(user.id);
 
     return EventListDto.from(events);
   }

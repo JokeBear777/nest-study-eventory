@@ -40,6 +40,15 @@ export class CreateEventPayload {
   })
   categoryId!: number;
 
+  @IsInt()
+  @IsOptional()
+  @ApiProperty({
+    description: '클럽 ID',
+    type: Number,
+    nullable: true,
+  })
+  clubId?: number | null;
+
   @IsArray()
   @ArrayNotEmpty()
   @IsInt({ each: true })

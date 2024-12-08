@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/services/prisma.service';
 import { CreateReviewData } from './type/create-review-data.type';
 import { ReviewData } from './type/review-data.type';
-import { User, Event } from '@prisma/client';
+import { User, Event, Status } from '@prisma/client';
 import { ReviewQuery } from './query/review.query';
 import { UpdateReviewData } from './type/update-review-data.type';
+import { EventData } from './type/event-data';
 
 @Injectable()
 export class ReviewRepository {
@@ -95,7 +96,7 @@ export class ReviewRepository {
     });
   }
 
-  async getReviews(query: ReviewQuery): Promise<ReviewData[]> {
+  async getReviews(query: ReviewQuery, userId: number): Promise<ReviewData[]> {
     return this.prisma.review.findMany({
       where: {
         eventId: query.eventId,
@@ -145,5 +146,74 @@ export class ReviewRepository {
         id: reviewId,
       },
     });
+  }
+
+  async isClubMember(clubId: number, userId: number): Promise<boolean> {
+    const clubMember = await this.prisma.clubMember.findUnique({
+      where: {
+        clubId_userId: {
+          clubId: clubId,
+          userId: userId,
+        },
+        status: Status.APPROVED,
+      },
+    });
+
+    return clubMember !== null;
+  }
+
+  async getEventsByIds(eventIds: number[]): Promise<EventData[]> {
+    return this.prisma.event.findMany({
+      where: { id: { in: eventIds } },
+      select: {
+        id: true,
+        hostId: true,
+        title: true,
+        description: true,
+        categoryId: true,
+        clubId: true,
+        startTime: true,
+        endTime: true,
+        maxPeople: true,
+        isArchived: true,
+        eventCity: {
+          select: {
+            id: true,
+            cityId: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getUserJoinedEventIds(
+    eventIds: number[],
+    userId: number,
+  ): Promise<number[]> {
+    const joinedEvents = await this.prisma.eventJoin.findMany({
+      where: {
+        eventId: { in: eventIds },
+        userId: userId,
+      },
+      select: {
+        eventId: true,
+      },
+    });
+
+    return joinedEvents.map((event) => event.eventId);
+  }
+
+  async getUserJoinedClubIds(userId: number): Promise<number[]> {
+    const joinedClubs = await this.prisma.clubMember.findMany({
+      where: {
+        userId: userId,
+        status: Status.APPROVED,
+      },
+      select: {
+        clubId: true,
+      },
+    });
+
+    return joinedClubs.map((clubMember) => clubMember.clubId);
   }
 }
