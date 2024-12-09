@@ -273,7 +273,7 @@ export class ClubRepository {
           clubId: clubId,
           userId: userId,
         },
-        status : Status.APPROVED,
+        status: Status.APPROVED,
       },
     });
 
