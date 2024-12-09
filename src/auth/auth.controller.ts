@@ -1,6 +1,17 @@
-import { Body, Controller, HttpCode, Post, Req, Res } from '@nestjs/common';
 import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  Put,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -10,6 +21,10 @@ import { TokenDto } from './dto/token.dto';
 import { SignUpPayload } from './payload/sign-up.payload';
 import { Response, Request } from 'express';
 import { LoginPayload } from './payload/login.payload';
+import { CurrentUser } from './decorator/user.decorator';
+import type { UserBaseInfo } from './type/user-base-info.type';
+import type { ChangePasswordPayload } from './payload/change-password.payload';
+import { JwtAuthGuard } from './guard/jwt-auth.guard';
 
 @Controller('auth')
 @ApiTags('Auth API')
@@ -79,5 +94,18 @@ export class AuthController {
     });
 
     return TokenDto.from(tokens.accessToken);
+  }
+
+  @Put('password')
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '비밀번호 변경' })
+  @ApiNoContentResponse()
+  async changePassword(
+    @Body() payload: ChangePasswordPayload,
+    @CurrentUser() user: UserBaseInfo,
+  ): Promise<void> {
+    return this.authService.changePassword(payload, user);
   }
 }
