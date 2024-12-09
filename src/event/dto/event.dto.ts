@@ -33,6 +33,12 @@ export class EventDto {
   categoryId!: number;
 
   @ApiProperty({
+    description: '클럽 Id',
+    type: Number,
+  })
+  clubId!: number | null;
+
+  @ApiProperty({
     description: '지역 목록',
     type: [Number],
   })
@@ -56,6 +62,12 @@ export class EventDto {
   })
   maxPeople!: number;
 
+  @ApiProperty({
+    description: '아카이브 상태인지 여부',
+    type: Boolean,
+  })
+  isArchived!: boolean;
+
   static from(event: EventData): EventDto {
     return {
       id: event.id,
@@ -63,10 +75,12 @@ export class EventDto {
       title: event.title,
       description: event.description,
       categoryId: event.categoryId,
+      clubId: event.clubId,
       cityIds: event.eventCity.map((city) => city.cityId),
       startTime: event.startTime,
       endTime: event.endTime,
       maxPeople: event.maxPeople,
+      isArchived: event.isArchived,
     };
   }
 
